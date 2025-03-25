@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.bilalemregrkn.mygrid": {
+      "version": "https://github.com/bilalemregrkn/MyGrid.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "83943d5b8a8c3e119287141711ee72fcadff9d29"
+    },
     "com.unity.collab-proxy": {
       "version": "2.2.0",
       "depth": 0,
