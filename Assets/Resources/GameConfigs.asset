@@ -22,11 +22,11 @@ MonoBehaviour:
   itemStillScale: {x: 0.5, y: 0.5}
   itemDragScale: {x: 1, y: 1}
   gridFillDuration: 0.25
-  linePassiveColor: {r: 0.735849, g: 0.735849, b: 0.735849, a: 1}
-  hoverColor: {r: 0, g: 0.627451, b: 1, a: 1}
-  activeColor: {r: 0, g: 1, b: 0, a: 1}
+  linePassiveColor: {r: 0.32156864, g: 0.35686275, b: 0.8509804, a: 1}
+  hoverColor: {r: 0.3521271, g: 0.37292632, b: 0.38679248, a: 0.65882355}
+  activeColor: {r: 0.1882353, g: 0.84705883, b: 0.14509805, a: 0.9019608}
   gridHoverColor: {r: 1, g: 0, b: 0, a: 1}
-  itemStillColor: {r: 0, g: 1, b: 1, a: 1}
+  itemStillColor: {r: 0.1882353, g: 0.84705883, b: 0.14509805, a: 1}
   itemSpawnCount: 3
   itemMoveAnimDuration: 0.25
   itemMoveAnimInterval: 0.22
