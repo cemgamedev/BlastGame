@@ -32,11 +32,11 @@ MonoBehaviour:
   itemMoveAnimInterval: 0.22
   itemSpawnProbabilities:
   - ItemShapes: 0
-    Probability: 3
+    Probability: 1
   - ItemShapes: 4
-    Probability: 2
+    Probability: 1
   - ItemShapes: 2
-    Probability: 3
+    Probability: 1
   - ItemShapes: 1
     Probability: 1
   - ItemShapes: 3

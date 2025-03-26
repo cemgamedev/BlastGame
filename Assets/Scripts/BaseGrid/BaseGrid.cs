@@ -9,6 +9,7 @@ using Ebleme.Utility;
 using StickBlast.Grid;
 using UnityEngine;
 using StickBlast.Models;
+using System.Collections;
 
 namespace StickBlast
 {
@@ -110,18 +111,56 @@ namespace StickBlast
 
             if (linesToRemove.Count > 0)
             {
-                foreach (var line in linesToRemove)
+                StartCoroutine(HandleCompletedLines());
+            }
+        }
+
+        private IEnumerator HandleCompletedLines()
+        {
+            // Get all cells that need to play blast effect
+            var cellsToBlast = new HashSet<GridCell>();
+            foreach (var line in linesToRemove)
+            {
+                foreach (var cell in gridCells.GetCells())
                 {
-                    line.DeOccupied();
-                    line.DeHover();
+                    if (cell.IsOccupied && cell.HasLine(line))
+                    {
+                        cellsToBlast.Add(cell);
+                    }
                 }
+            }
 
-                foreach (var tile in tilesToRemove)
-                    tile.DeOccupied();
+            // Convert to list for ordered iteration
+            var cellsList = cellsToBlast.ToList();
+            
+            // Play blast effects in sequence
+            float delayBetweenBlasts = 0.2f;
+            int completedCount = 0;
 
-                // clear cells
-                gridCells.CheckCells();
-                gridCells.ClearCells();
+            // Sağdan sola doğru sıralı çalıştır
+            for (int i = cellsList.Count - 1; i >= 0; i--)
+            {
+                var cell = cellsList[i];
+                cell.PlayBlastEffect(i * delayBetweenBlasts, () => {
+                    completedCount++;
+                    if (completedCount == cellsList.Count)
+                    {
+                        // All blast effects completed, remove the lines
+                        foreach (var line in linesToRemove)
+                        {
+                            line.DeOccupied();
+                            line.DeHover();
+                        }
+
+                        foreach (var tile in tilesToRemove)
+                            tile.DeOccupied();
+
+                        // clear cells
+                        gridCells.CheckCells();
+                        gridCells.ClearCells();
+                    }
+                });
+                yield return new WaitForSeconds(delayBetweenBlasts);
             }
         }
 

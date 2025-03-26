@@ -10,6 +10,9 @@ namespace StickBlast
 {
     public class GridCell : MonoBehaviour
     {
+        [SerializeField]
+        private BlastParticle blastParticlePrefab;
+
         private Vector2Int coordinate;
         public Vector2Int Coordinate => coordinate;
 
@@ -18,9 +21,10 @@ namespace StickBlast
         private Tween blinkTween;
 
         private HashSet<BaseLine> gridLines;
-        private bool IsOccupied;
+        public bool IsOccupied;
         private bool IsHovered;
         private bool hasPlayedScaleAnimation;
+        private bool hasPlayedBlastEffect;
 
         private void Awake()
         {
@@ -103,6 +107,16 @@ namespace StickBlast
             IsHovered = false;
             spriteRenderer.color = hideColor;
             hasPlayedScaleAnimation = false;
+            hasPlayedBlastEffect = false;
+        }
+
+        public void PlayBlastEffect(float sequenceDelay, System.Action onComplete)
+        {
+            if (hasPlayedBlastEffect || !IsOccupied) return;
+            hasPlayedBlastEffect = true;
+
+            var blastParticle = Instantiate(blastParticlePrefab, transform.position, Quaternion.identity);
+            blastParticle.Play(GameConfigs.Instance.ActiveColor, transform.position, sequenceDelay, onComplete);
         }
 
         public bool CanBeHovered()
@@ -145,6 +159,11 @@ namespace StickBlast
             {
                 spriteRenderer.color = hideColor;
             }
+        }
+
+        public bool HasLine(BaseLine line)
+        {
+            return gridLines.Contains(line);
         }
 
         public void UpdateColor(ColorTypes status)

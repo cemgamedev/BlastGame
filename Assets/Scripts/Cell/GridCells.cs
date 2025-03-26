@@ -96,5 +96,10 @@ namespace StickBlast
                 cell.ClearOccupation();
             }
         }
+
+        public List<GridCell> GetCells()
+        {
+            return cells;
+        }
     }
 }
