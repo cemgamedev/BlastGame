@@ -13,13 +13,13 @@ namespace DefaultNamespace
 {
     public interface IItemSpawner
     {
-        void SpawnItems();
-        void OnItemDestroyed(Item item);
+        void HandleItemSpawn();
+        void HandleItemDestruction(Item item);
     }
 
     public interface IItemAnimationController
     {
-        void AnimateItems(List<Item> items, Transform[] itemPoints, Action onComplete);
+        void HandleItemAnimation(List<Item> items, Transform[] itemPoints, Action onComplete);
     }
 
     public class ItemAnimationController : IItemAnimationController
@@ -31,12 +31,12 @@ namespace DefaultNamespace
             // DOTween initialization moved to Awake
         }
 
-        public void Initialize()
+        public void HandleInitialization()
         {
             sequence = DOTween.Sequence();
         }
 
-        public void AnimateItems(List<Item> items, Transform[] itemPoints, Action onComplete)
+        public void HandleItemAnimation(List<Item> items, Transform[] itemPoints, Action onComplete)
         {
             if (sequence == null)
             {
@@ -71,7 +71,7 @@ namespace DefaultNamespace
         private void Awake()
         {
             animationController = new ItemAnimationController();
-            ((ItemAnimationController)animationController).Initialize();
+            ((ItemAnimationController)animationController).HandleInitialization();
         }
 
         private void Start()
@@ -81,10 +81,10 @@ namespace DefaultNamespace
                 Debug.LogError("CommonGameAssets is not initialized!");
                 return;
             }
-            SpawnItems();
+            HandleItemSpawn();
         }
 
-        public void SpawnItems()
+        public void HandleItemSpawn()
         {
             if (CommonGameAssets.Instance == null)
             {
@@ -107,18 +107,18 @@ namespace DefaultNamespace
 
                 var item = Instantiate(itemPrefab);
                 item.transform.position = spawnPoint.position;
-                item.OnItemDestroyed += OnItemDestroyed;
+                item.OnItemDestroyed += HandleItemDestruction;
                 items.Add(item);
             }
 
-            animationController.AnimateItems(items, itemPoints, () =>
+            animationController.HandleItemAnimation(items, itemPoints, () =>
             {
                 foreach (var item in items)
                     item.SetCanTouch();
             });
         }
 
-        public void OnItemDestroyed(Item item)
+        public void HandleItemDestruction(Item item)
         {
             if (items.Contains(item))
             {
@@ -126,7 +126,7 @@ namespace DefaultNamespace
 
                 if (items.Count == 0)
                 {
-                    SpawnItems();
+                    HandleItemSpawn();
                 }
             }
             else

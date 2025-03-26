@@ -108,17 +108,21 @@ namespace StickBlast
             CheckHorizontal();
             CheckVertical();
 
-            foreach (var line in linesToRemove)
+            if (linesToRemove.Count > 0)
             {
-                line.DeOccupied();
-                line.DeHover();
+                foreach (var line in linesToRemove)
+                {
+                    line.DeOccupied();
+                    line.DeHover();
+                }
+
+                foreach (var tile in tilesToRemove)
+                    tile.DeOccupied();
+
+                // clear cells
+                gridCells.CheckCells();
+                gridCells.ClearCells();
             }
-
-            foreach (var tile in tilesToRemove)
-                tile.DeOccupied();
-
-            // clear cells
-            gridCells.CheckCells();
         }
 
         private void CheckHorizontal()
@@ -386,6 +390,140 @@ namespace StickBlast
                 }
             
             gridCells.HoverCells();
+        }
+
+        private HashSet<BaseLine> HandleVerticalLinesByRow(int row)
+        {
+            HashSet<BaseLine> lines = new HashSet<BaseLine>();
+
+            for (int i = 0; i < GameConfigs.Instance.BaseGridSize.x; i++)
+            {
+                var line = HandleLineRetrieval(i, row, LineDirection.Vertical);
+                lines.Add(line);
+            }
+
+            return lines;
+        }
+
+        private HashSet<BaseLine> HandleHorizontalLinesByColumn(int column)
+        {
+            HashSet<BaseLine> lines = new HashSet<BaseLine>();
+            for (int i = 0; i < GameConfigs.Instance.BaseGridSize.y; i++)
+            {
+                var line = HandleLineRetrieval(column, i, LineDirection.Horizontal);
+                lines.Add(line);
+            }
+
+            return lines;
+        }
+
+        private HashSet<BaseLine> HandleVerticalLinesByColumn(int column)
+        {
+            HashSet<BaseLine> lines = new HashSet<BaseLine>();
+
+            for (int i = 0; i < GameConfigs.Instance.BaseGridSize.y - 1; i++)
+            {
+                var line = HandleLineRetrieval(column, i, LineDirection.Vertical);
+                lines.Add(line);
+            }
+
+            return lines;
+        }
+
+        private HashSet<BaseTile> HandleHorizontalTiles(int row)
+        {
+            HashSet<BaseTile> tiles = new HashSet<BaseTile>();
+            for (int i = 0; i < GameConfigs.Instance.BaseGridSize.x; i++)
+            {
+                var tile = HandleTileRetrieval(i, row);
+                tiles.Add(tile);
+            }
+
+            return tiles;
+        }
+
+        private HashSet<BaseTile> HandleVerticalTiles(int column)
+        {
+            HashSet<BaseTile> tiles = new HashSet<BaseTile>();
+            for (int i = 0; i < GameConfigs.Instance.BaseGridSize.y; i++)
+            {
+                var tile = HandleTileRetrieval(column, i);
+                tiles.Add(tile);
+            }
+
+            return tiles;
+        }
+
+        private bool HandleVerticalRowCompletion(int row)
+        {
+            for (int i = 0; i < GameConfigs.Instance.BaseGridSize.x; i++)
+            {
+                var line = HandleLineRetrieval(i, row, LineDirection.Vertical);
+                if (line == null || !line.IsOccupied) return false;
+            }
+
+            return true;
+        }
+
+        private bool HandleVerticalColumnCompletion(int column)
+        {
+            for (int i = 0; i < GameConfigs.Instance.BaseGridSize.y - 1; i++)
+            {
+                var line = HandleLineRetrieval(column, i, LineDirection.Vertical);
+                if (line == null || !line.IsOccupied) return false;
+            }
+
+            return true;
+        }
+
+        private bool HandleHorizontalColumnCompletion(int column)
+        {
+            for (int i = 0; i < GameConfigs.Instance.BaseGridSize.y; i++)
+            {
+                var line = HandleLineRetrieval(column, i, LineDirection.Horizontal);
+                if (line == null || !line.IsOccupied) return false;
+            }
+
+            return true;
+        }
+
+        private bool HandleHorizontalRowCompletion(int row)
+        {
+            for (int i = 0; i < GameConfigs.Instance.BaseGridSize.x - 1; i++)
+            {
+                var line = HandleLineRetrieval(i, row, LineDirection.Horizontal);
+                if (line == null || !line.IsOccupied) return false;
+            }
+
+            return true;
+        }
+
+        private BaseLine HandleLineRetrieval(int x, int y, LineDirection direction)
+        {
+            return lines.SingleOrDefault(p => p.coordinate == new Vector2Int(x, y) && p.lineDirection == direction);
+        }
+
+        private BaseTile HandleTileRetrieval(int x, int y)
+        {
+            return (BaseTile)gridManager.Tiles.SingleOrDefault(p => p.coordinate == new Vector2Int(x, y));
+        }
+
+
+        public void HandleItemPlacement(List<BaseLine> lines)
+        {
+            if (lines == null)
+                return;
+
+            foreach (var line in lines)
+            {
+                foreach (var tileController in line.ConnectedTiles)
+                {
+                    var tile = (BaseTile)tileController;
+                    tile.SetOccupied();
+                }
+
+                line.SetOccupied();
+            }
         }
     }
 }

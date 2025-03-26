@@ -57,7 +57,7 @@ namespace StickBlast
                 var bottomLine = BaseGrid.Instance.Lines.FirstOrDefault(p => p.coordinate == coordinate && p.lineDirection == LineDirection.Horizontal);
 
                 var cell = Instantiate(gridCellPrefab, content);
-                cell.Set(coordinate, topLine, rightLine, bottomLine, leftLine);
+                cell.Initialize(coordinate, topLine, rightLine, bottomLine, leftLine);
                 
                 cells.Add(cell);
             }
@@ -67,42 +67,33 @@ namespace StickBlast
         {
             foreach (var cell in cells)
             {
-                if (cell.IsLinesOccupied())
+                if (cell.CheckLineOccupation())
                 {
                     cell.SetOccupied();
-                }
-                else
-                {
-                    cell.DeOccupie();
-                    cell.DeHover();
                 }
             }
         }
 
         public void HoverCells()
         {
-            /*
-            * Son gelen Item;
-            * - bir gridi tamamlıyorsa o grid
-            * - bir satırı tamamlıyorsa o satır
-            * - bir sütunu tamamlıyorsa o sütun hover olacak
-            *
-            * Grid in line larını IsHoverin olmalı. Yani elde olan Item placable pozisyonda olmalı. BUraya geliyorsa zaten Item canPlaced konumundadır
-            * Grid 
-            *
-            * 
-            */
-            
             foreach (var cell in cells)
             {
-                if (cell.CanHover())
+                if (cell.CanBeHovered() && cell.CheckLineOccupation())
                 {
-                    cell.Hover();
+                    cell.SetHover();
                 }
                 else
                 {
-                    cell.DeHover();
+                    cell.ClearHover();
                 }
+            }
+        }
+
+        public void ClearCells()
+        {
+            foreach (var cell in cells)
+            {
+                cell.ClearOccupation();
             }
         }
     }

@@ -6,6 +6,7 @@ using System.Linq;
 using Ebleme;
 using UnityEngine;
 using StickBlast.Models;
+using DG.Tweening;
 
 namespace StickBlast
 {
@@ -16,6 +17,7 @@ namespace StickBlast
 
         private SpriteRenderer spriteRenderer;
         private Color hideColor = new Color(0, 0, 0, 0);
+        private Tween blinkTween;
 
         private HashSet<BaseLine> gridLines;
         private bool IsOccupied;
@@ -28,14 +30,22 @@ namespace StickBlast
 
         private void Start()
         {
-            Hide();
+            SetVisibility(false);
         }
 
-        public void Set(Vector2Int coordinate, BaseLine topLine, BaseLine rightLine, BaseLine bottomLine, BaseLine leftLine)
+        private void OnDestroy()
+        {
+            if (blinkTween != null)
+            {
+                blinkTween.Kill();
+                blinkTween = null;
+            }
+        }
+
+        public void Initialize(Vector2Int coordinate, BaseLine topLine, BaseLine rightLine, BaseLine bottomLine, BaseLine leftLine)
         {
             this.coordinate = coordinate;
 
-            // lines = new Dictionary<Direction, BaseLine>();
             gridLines = new HashSet<BaseLine>
             {
                 topLine,
@@ -43,7 +53,6 @@ namespace StickBlast
                 bottomLine,
                 leftLine
             };
-
 
             Vector3 center = Vector3.zero;
             foreach (var line in gridLines)
@@ -53,18 +62,15 @@ namespace StickBlast
 
             center /= gridLines.Count;
 
-            // Nesneyi merkeze yerleştir
             transform.position = center;
 
-            // Genişliği ve yüksekliği hesapla
             float width = Mathf.Abs((leftLine.transform.position - rightLine.transform.position).x);
             float height = Mathf.Abs((topLine.transform.position - bottomLine.transform.position).y);
 
-            // Scale değerlerini ayarla
             spriteRenderer.size = new Vector2(width, height);
         }
 
-        public bool IsLinesOccupied()
+        public bool CheckLineOccupation()
         {
             foreach (var line in gridLines)
             {
@@ -81,34 +87,21 @@ namespace StickBlast
         {
             IsOccupied = true;
             IsHovered = false;
-
-            Show();
+            spriteRenderer.color = GameConfigs.Instance.ActiveColor;
         }
 
-        public void DeOccupie()
+        public void ClearOccupation()
         {
-            // if (IsOccupied)
-            // {
-            //     foreach (var line in gridLines)
-            //     {
-            //         line.DeHover();
-            //         line.DeOccupied();
-            //     }
-            // }
-
             IsOccupied = false;
             IsHovered = false;
-
-            Hide();
+            spriteRenderer.color = hideColor;
         }
 
-        public bool CanHover()
+        public bool CanBeHovered()
         {
-            // can be deleted
             if (IsOccupied)
                 return false;
 
-            // line lar ya occupied olmalı yada hovering olmalı
             bool canHover = false;
             foreach (var line in gridLines)
             {
@@ -121,50 +114,35 @@ namespace StickBlast
             return canHover;
         }
 
-        public void Hover()
+        public void SetHover()
         {
             IsHovered = true;
-            spriteRenderer.color = GameConfigs.Instance.GridHoverColor;
+            // No color change on hover
         }
 
-        public void DeHover()
+        public void ClearHover()
         {
             if (IsHovered)
             {
                 IsHovered = false;
-                Hide();
             }
         }
 
-        private void Show()
+        private void SetVisibility(bool isVisible)
         {
-            spriteRenderer.color = GameConfigs.Instance.ActiveColor;
-        }
-
-        private void Hide()
-        {
-            spriteRenderer.color = hideColor;
-        }
-
-        public void ReColor(ColorTypes status)
-        {
-            switch (status)
+            if (IsOccupied)
             {
-                case ColorTypes.ItemStill:
-                    spriteRenderer.color = GameConfigs.Instance.ItemStillColor;
-                    break;
-                case ColorTypes.Passive:
-                    spriteRenderer.color = GameConfigs.Instance.LinePassiveColor;
-                    break;
-                case ColorTypes.Hover:
-                    spriteRenderer.color = GameConfigs.Instance.HoverColor;
-                    break;
-                case ColorTypes.Active:
-                    spriteRenderer.color = GameConfigs.Instance.ActiveColor;
-                    break;
-                default:
-                    break;
+                spriteRenderer.color = GameConfigs.Instance.ActiveColor;
             }
+            else
+            {
+                spriteRenderer.color = hideColor;
+            }
+        }
+
+        public void UpdateColor(ColorTypes status)
+        {
+            // No color changes for different states
         }
     }
 }
