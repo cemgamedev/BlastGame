@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32c931c74f6d47048f03a084abe977de, type: 3}
+  m_Name: GameConfigs
+  m_EditorClassIdentifier: 
+  baseTileLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  baseLineLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  baseGridSize: {x: 6, y: 6}
+  itemStillScale: {x: 0.5, y: 0.5}
+  itemDragScale: {x: 1, y: 1}
+  gridFillDuration: 0.25
+  linePassiveColor: {r: 0.735849, g: 0.735849, b: 0.735849, a: 1}
+  hoverColor: {r: 0, g: 0.627451, b: 1, a: 1}
+  activeColor: {r: 0, g: 1, b: 0, a: 1}
+  gridHoverColor: {r: 1, g: 0, b: 0, a: 1}
+  itemStillColor: {r: 0, g: 1, b: 1, a: 1}
+  itemSpawnCount: 3
+  itemMoveAnimDuration: 0.25
+  itemMoveAnimInterval: 0.22
+  itemSpawnProbabilities:
+  - ItemShapes: 0
+    Probability: 3
+  - ItemShapes: 4
+    Probability: 2
+  - ItemShapes: 2
+    Probability: 3
+  - ItemShapes: 1
+    Probability: 1
+  - ItemShapes: 3
+    Probability: 1
