@@ -307,5 +307,20 @@ namespace StickBlast
         }
 
         #endregion
+
+        public Vector3 GetOriginalPosition()
+        {
+            return startPosition;
+        }
+
+        public Vector3 GetTargetPosition()
+        {
+            // İlk tile'ın pozisyonunu hedef pozisyon olarak kullanıyoruz
+            if (tiles.Count > 0)
+            {
+                return tiles[0].transform.position;
+            }
+            return transform.position;
+        }
     }
 }

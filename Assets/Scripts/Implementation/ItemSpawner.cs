@@ -31,6 +31,13 @@ namespace StickBlast.Implementation
                 Debug.LogError("CommonGameAssets is not initialized!");
                 return;
             }
+
+            // Spawn point'i animation controller'a aktar
+            if (spawnPoint != null)
+            {
+                ((ItemAnimationController)animationController).SetSpawnPoint(spawnPoint.position);
+            }
+
             HandleItemSpawn();
         }
 

@@ -1,6 +1,7 @@
 using UnityEngine;
 using StickBlast.Core.Interfaces;
 using StickBlast.Models;
+using StickBlast.Core.DependencyInjection;
 
 namespace StickBlast.Implementation
 {
@@ -12,6 +13,8 @@ namespace StickBlast.Implementation
         private Vector2 offset;
         private ItemTile itemTile;
         private bool canMove = true;
+        private IItemAnimationController animationController;
+        private bool isDragging;
         
         public bool CanMove 
         { 
@@ -22,19 +25,22 @@ namespace StickBlast.Implementation
         private void Start()
         {
             itemTile = GetComponent<ItemTile>();
+            animationController = ServiceLocator.Instance.GetItemAnimationController();
         }
 
         public void OnStartMove()
         {
             if (!canMove) return;
+            isDragging = true;
             var target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             offset = itemTile.Item.GetPosition() - target;
             itemTile.Item.SetMovingScale();
+            animationController.HandleItemHover(transform, true);
         }
 
         public void OnMove(Vector2 position)
         {
-            if (!canMove) return;
+            if (!canMove || !isDragging) return;
             Vector2 target = Camera.main.ScreenToWorldPoint(position);
             target += offset;
             itemTile.Item.SetPosition(target);
@@ -42,17 +48,27 @@ namespace StickBlast.Implementation
 
         public void OnEndMove()
         {
-            if (!canMove) return;
+            if (!canMove || !isDragging) return;
+            isDragging = false;
+            animationController.HandleItemHover(transform, false);
+
             var allowSetToGrid = itemTile.Item.AllowSetToGrid();
 
             if (allowSetToGrid)
             {
-                itemTile.Item.AssingItemTilesToGridTiles();
-                BaseGrid.Instance.CheckGrid();
+                var targetPosition = itemTile.Item.GetPosition();
+                animationController.HandleItemPlacement(transform, targetPosition, () =>
+                {
+                    itemTile.Item.AssingItemTilesToGridTiles();
+                    BaseGrid.Instance.CheckGrid();
+                });
             }
             else
             {
-                itemTile.Item.ReleaseAll();
+                animationController.HandleItemSnap(transform, itemTile.Item.GetOriginalPosition(), () =>
+                {
+                    itemTile.Item.ReleaseAll();
+                });
             }
         }
 
