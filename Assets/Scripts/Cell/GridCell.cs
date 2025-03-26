@@ -1,5 +1,3 @@
-// maebleme2
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +20,7 @@ namespace StickBlast
         private HashSet<BaseLine> gridLines;
         private bool IsOccupied;
         private bool IsHovered;
+        private bool hasPlayedScaleAnimation;
 
         private void Awake()
         {
@@ -88,6 +87,14 @@ namespace StickBlast
             IsOccupied = true;
             IsHovered = false;
             spriteRenderer.color = GameConfigs.Instance.ActiveColor;
+
+            if (!hasPlayedScaleAnimation)
+            {
+                transform.localScale = Vector3.zero;
+                transform.DOScale(Vector3.one, 1f)
+                    .SetEase(Ease.Linear);
+                hasPlayedScaleAnimation = true;
+            }
         }
 
         public void ClearOccupation()
@@ -95,6 +102,7 @@ namespace StickBlast
             IsOccupied = false;
             IsHovered = false;
             spriteRenderer.color = hideColor;
+            hasPlayedScaleAnimation = false;
         }
 
         public bool CanBeHovered()
@@ -117,7 +125,6 @@ namespace StickBlast
         public void SetHover()
         {
             IsHovered = true;
-            // No color change on hover
         }
 
         public void ClearHover()
@@ -142,7 +149,6 @@ namespace StickBlast
 
         public void UpdateColor(ColorTypes status)
         {
-            // No color changes for different states
         }
     }
 }
