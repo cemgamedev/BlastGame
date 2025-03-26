@@ -115,8 +115,18 @@ namespace StickBlast
             if (hasPlayedBlastEffect || !IsOccupied) return;
             hasPlayedBlastEffect = true;
 
-            var blastParticle = Instantiate(blastParticlePrefab, transform.position, Quaternion.identity);
-            blastParticle.Play(GameConfigs.Instance.ActiveColor, transform.position, sequenceDelay, onComplete);
+            // Create a sequence for the shake and blast effect
+            Sequence sequence = DOTween.Sequence();
+            
+            // Add shake effect
+            sequence.Append(transform.DOShakePosition(0.3f, 0.2f, 10, 90, false, true)
+                .SetEase(Ease.OutElastic));
+            
+            // Add blast effect after shake
+            sequence.AppendCallback(() => {
+                var blastParticle = Instantiate(blastParticlePrefab, transform.position, Quaternion.identity);
+                blastParticle.Play(GameConfigs.Instance.ActiveColor, transform.position, sequenceDelay, onComplete);
+            });
         }
 
         public bool CanBeHovered()

@@ -130,20 +130,22 @@ namespace StickBlast
                 }
             }
 
-            // Convert to list for ordered iteration
-            var cellsList = cellsToBlast.ToList();
-            
             // Play blast effects in sequence
             float delayBetweenBlasts = 0.2f;
             int completedCount = 0;
+            int totalCellsToBlast = cellsToBlast.Count;
 
             // Sağdan sola doğru sıralı çalıştır
-            for (int i = cellsList.Count - 1; i >= 0; i--)
+            var cellsList = cellsToBlast.OrderByDescending(c => c.Coordinate.x).ToList();
+            for (int i = 0; i < cellsList.Count; i++)
             {
                 var cell = cellsList[i];
                 cell.PlayBlastEffect(i * delayBetweenBlasts, () => {
+                    // Reset cell color after blast
+                    cell.ClearOccupation();
                     completedCount++;
-                    if (completedCount == cellsList.Count)
+                    
+                    if (completedCount == totalCellsToBlast)
                     {
                         // All blast effects completed, remove the lines
                         foreach (var line in linesToRemove)
@@ -157,10 +159,37 @@ namespace StickBlast
 
                         // clear cells
                         gridCells.CheckCells();
-                        gridCells.ClearCells();
                     }
                 });
                 yield return new WaitForSeconds(delayBetweenBlasts);
+            }
+        }
+
+        private void FindConnectedCells(GridCell startCell, HashSet<GridCell> remainingCells, List<GridCell> connectedGroup)
+        {
+            if (!remainingCells.Contains(startCell))
+                return;
+
+            remainingCells.Remove(startCell);
+            connectedGroup.Add(startCell);
+
+            // Check all four directions for adjacent cells
+            var directions = new Vector2Int[] {
+                new Vector2Int(0, 1),  // Up
+                new Vector2Int(0, -1), // Down
+                new Vector2Int(1, 0),  // Right
+                new Vector2Int(-1, 0)  // Left
+            };
+
+            foreach (var direction in directions)
+            {
+                var adjacentCoord = startCell.Coordinate + direction;
+                var adjacentCell = gridCells.GetCells().FirstOrDefault(c => c.Coordinate == adjacentCoord);
+                
+                if (adjacentCell != null && remainingCells.Contains(adjacentCell))
+                {
+                    FindConnectedCells(adjacentCell, remainingCells, connectedGroup);
+                }
             }
         }
 
