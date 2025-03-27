@@ -99,7 +99,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemType: 90
-  movingScale: {x: 1, y: 1, z: 1}
   linePrefab: {fileID: 1026901159554036664, guid: 1d6eaa59ab7e1644f8bce7e991d78c48, type: 3}
   linesContent: {fileID: 8778396308401206426}
   lines: []
