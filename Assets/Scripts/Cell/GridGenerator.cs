@@ -10,10 +10,10 @@ using System.Collections;
 
 namespace StickBlast
 {
-    public class GridCells : MonoBehaviour
+    public class GridGenerator : MonoBehaviour
     {
         [SerializeField]
-        private GridCell gridCellPrefab;
+        private SquareCell gridCellPrefab;
 
         [SerializeField]
         private Transform content;
@@ -21,7 +21,7 @@ namespace StickBlast
         
         HashSet<Vector2Int> coordinates = new HashSet<Vector2Int>();
 
-        private List<GridCell> cells = new List<GridCell>();
+        private List<SquareCell> cells = new List<SquareCell>();
 
         public void SetCells()
         {
@@ -44,7 +44,7 @@ namespace StickBlast
             // Right    : [+1,0]
             // Top      : [0,+1]
             // Bottom   : [0,0]
-            cells = new List<GridCell>();
+            cells = new List<SquareCell>();
 
             foreach (Transform c in content)
                 Destroy(c.gameObject);
@@ -81,17 +81,17 @@ namespace StickBlast
 		{
 			float delayBetweenBlasts = 0.1f; // Sesler arasında gecikme
 
-			Dictionary<int, List<GridCell>> rows = new Dictionary<int, List<GridCell>>();
-			Dictionary<int, List<GridCell>> columns = new Dictionary<int, List<GridCell>>();
+			Dictionary<int, List<SquareCell>> rows = new Dictionary<int, List<SquareCell>>();
+			Dictionary<int, List<SquareCell>> columns = new Dictionary<int, List<SquareCell>>();
 
 			foreach (var cell in cells)
 			{
 				if (!rows.ContainsKey(cell.Coordinate.y))
-					rows[cell.Coordinate.y] = new List<GridCell>();
+					rows[cell.Coordinate.y] = new List<SquareCell>();
 				rows[cell.Coordinate.y].Add(cell);
 
 				if (!columns.ContainsKey(cell.Coordinate.x))
-					columns[cell.Coordinate.x] = new List<GridCell>();
+					columns[cell.Coordinate.x] = new List<SquareCell>();
 				columns[cell.Coordinate.x].Add(cell);
 			}
 
@@ -114,7 +114,7 @@ namespace StickBlast
 			}
 		}
 
-		private IEnumerator PlayRowBlastEffect(List<GridCell> row, float delayBetweenBlasts)
+		private IEnumerator PlayRowBlastEffect(List<SquareCell> row, float delayBetweenBlasts)
 		{
 			for (int i = 0; i < row.Count; i++)
 			{
@@ -126,7 +126,7 @@ namespace StickBlast
 			}
 		}
 
-		private IEnumerator PlayColumnBlastEffect(List<GridCell> column, float delayBetweenBlasts)
+		private IEnumerator PlayColumnBlastEffect(List<SquareCell> column, float delayBetweenBlasts)
 		{
 			for (int i = 0; i < column.Count; i++)
 			{
@@ -161,7 +161,7 @@ namespace StickBlast
             }
         }
 
-        public List<GridCell> GetCells()
+        public List<SquareCell> GetCells()
         {
             return cells;
         }

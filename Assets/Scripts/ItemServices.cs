@@ -16,7 +16,7 @@ namespace DefaultNamespace
 		void HandleItemSpawn();
 		void HandleItemDestruction(Item item);
 	}
-	public class ItemSpawner : Singleton<ItemSpawner>, IItemSpawner
+	public class ItemServices : Singleton<ItemServices>, IItemSpawner
 	{
 		[SerializeField]
 		private Transform[] itemPoints;
@@ -41,7 +41,7 @@ namespace DefaultNamespace
 		{
 			if (CommonGameAssets.Instance == null)
 			{
-				Debug.LogError("CommonGameAssets is not initialized!");
+				Debug.LogError("ItemCollectionCustomAsset is not initialized!");
 				return;
 			}
 			HandleItemSpawn();
@@ -66,7 +66,7 @@ namespace DefaultNamespace
 		{
 			if (CommonGameAssets.Instance == null)
 			{
-				Debug.LogError("CommonGameAssets is not initialized!");
+				Debug.LogError("ItemCollectionCustomAsset is not initialized!");
 				return;
 			}
 			var itemPrefabs = CommonGameAssets.Instance.GetRandomItems();

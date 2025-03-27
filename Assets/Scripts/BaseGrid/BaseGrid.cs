@@ -17,23 +17,23 @@ namespace StickBlast
     public class BaseGrid : Singleton<BaseGrid>
     {
         [SerializeField]
-        private GridManager gridManager;
+        private GridService gridManager;
 
         [SerializeField]
-        private GridCells gridCells;
+        private GridGenerator gridCells;
 
 
         [SerializeField]
-        private BaseLine linePrefab;
+        private Grain linePrefab;
 
         [SerializeField]
         private Transform linesContent;
 
-        private List<BaseLine> lines;
-        public List<BaseLine> Lines => lines;
+        private List<Grain> lines;
+        public List<Grain> Lines => lines;
 
 
-        private HashSet<BaseLine> linesToRemove;
+        private HashSet<Grain> linesToRemove;
         private HashSet<BaseTile> tilesToRemove;
 
         private void Start()
@@ -47,7 +47,7 @@ namespace StickBlast
 
         private void DrawLines()
         {
-            lines = new List<BaseLine>();
+            lines = new List<Grain>();
             for (int i = gridManager.Tiles.Count - 1; i >= 0; i--)
             {
                 var tile = gridManager.Tiles[i];
@@ -104,7 +104,7 @@ namespace StickBlast
 
         public void CheckGrid()
         {
-            linesToRemove = new HashSet<BaseLine>();
+            linesToRemove = new HashSet<Grain>();
             tilesToRemove = new HashSet<BaseTile>();
 
             CheckHorizontal();
@@ -119,7 +119,7 @@ namespace StickBlast
         private async UniTask HandleCompletedLinesAsync()
         {
             // Get all cells that need to play blast effect
-            var cellsToBlast = new HashSet<GridCell>();
+            var cellsToBlast = new HashSet<SquareCell>();
             foreach (var line in linesToRemove)
             {
                 foreach (var cell in gridCells.GetCells())
@@ -164,7 +164,7 @@ namespace StickBlast
             }
         }
 
-        private void FindConnectedCells(GridCell startCell, HashSet<GridCell> remainingCells, List<GridCell> connectedGroup)
+        private void FindConnectedCells(SquareCell startCell, HashSet<SquareCell> remainingCells, List<SquareCell> connectedGroup)
         {
             if (!remainingCells.Contains(startCell))
                 return;
@@ -266,10 +266,10 @@ namespace StickBlast
             }
         }
 
-        private HashSet<BaseLine> GetHorizontalLinesByRow(int row)
+        private HashSet<Grain> GetHorizontalLinesByRow(int row)
         {
             // Yatay
-            HashSet<BaseLine> lines = new HashSet<BaseLine>();
+            HashSet<Grain> lines = new HashSet<Grain>();
             for (int i = 0; i < GameConfigs.Instance.BaseGridSize.x - 1; i++)
             {
                 var line = GetLine(i, row, LineDirection.Horizontal);
@@ -279,10 +279,10 @@ namespace StickBlast
             return lines;
         }
 
-        private HashSet<BaseLine> GetVerticalLinesByRow(int row)
+        private HashSet<Grain> GetVerticalLinesByRow(int row)
         {
             // Dikey
-            HashSet<BaseLine> lines = new HashSet<BaseLine>();
+            HashSet<Grain> lines = new HashSet<Grain>();
 
             for (int i = 0; i < GameConfigs.Instance.BaseGridSize.x; i++)
             {
@@ -293,10 +293,10 @@ namespace StickBlast
             return lines;
         }
 
-        private HashSet<BaseLine> GetHorizontalLinesByColumn(int column)
+        private HashSet<Grain> GetHorizontalLinesByColumn(int column)
         {
             // Yatay
-            HashSet<BaseLine> lines = new HashSet<BaseLine>();
+            HashSet<Grain> lines = new HashSet<Grain>();
             for (int i = 0; i < GameConfigs.Instance.BaseGridSize.y; i++)
             {
                 var line = GetLine(column, i, LineDirection.Horizontal);
@@ -306,10 +306,10 @@ namespace StickBlast
             return lines;
         }
 
-        private HashSet<BaseLine> GetVerticalLinesByColumn(int column)
+        private HashSet<Grain> GetVerticalLinesByColumn(int column)
         {
             // Dikey
-            HashSet<BaseLine> lines = new HashSet<BaseLine>();
+            HashSet<Grain> lines = new HashSet<Grain>();
 
             for (int i = 0; i < GameConfigs.Instance.BaseGridSize.y - 1; i++)
             {
@@ -395,7 +395,7 @@ namespace StickBlast
             return true;
         }
 
-        private BaseLine GetLine(int x, int y, LineDirection direction)
+        private Grain GetLine(int x, int y, LineDirection direction)
         {
             return lines.SingleOrDefault(p => p.coordinate == new Vector2Int(x, y) && p.lineDirection == direction);
         }
@@ -408,7 +408,7 @@ namespace StickBlast
         #endregion
 
 
-        public void PutItemToGrid(List<BaseLine> lines)
+        public void PutItemToGrid(List<Grain> lines)
         {
             if (lines == null)
                 return;
@@ -425,7 +425,7 @@ namespace StickBlast
             }
         }
 
-        public void Hover(List<BaseLine> hoverLines)
+        public void Hover(List<Grain> hoverLines)
         {
             if (hoverLines != null)
                 foreach (var line in hoverLines)
@@ -442,7 +442,7 @@ namespace StickBlast
             gridCells.HoverCells();
         }
 
-        public void DeHover(List<BaseLine> hoverLines)
+        public void DeHover(List<Grain> hoverLines)
         {
             if (hoverLines != null)
                 foreach (var line in hoverLines)
@@ -459,9 +459,9 @@ namespace StickBlast
             gridCells.HoverCells();
         }
 
-        private HashSet<BaseLine> HandleVerticalLinesByRow(int row)
+        private HashSet<Grain> HandleVerticalLinesByRow(int row)
         {
-            HashSet<BaseLine> lines = new HashSet<BaseLine>();
+            HashSet<Grain> lines = new HashSet<Grain>();
 
             for (int i = 0; i < GameConfigs.Instance.BaseGridSize.x; i++)
             {
@@ -472,9 +472,9 @@ namespace StickBlast
             return lines;
         }
 
-        private HashSet<BaseLine> HandleHorizontalLinesByColumn(int column)
+        private HashSet<Grain> HandleHorizontalLinesByColumn(int column)
         {
-            HashSet<BaseLine> lines = new HashSet<BaseLine>();
+            HashSet<Grain> lines = new HashSet<Grain>();
             for (int i = 0; i < GameConfigs.Instance.BaseGridSize.y; i++)
             {
                 var line = HandleLineRetrieval(column, i, LineDirection.Horizontal);
@@ -484,9 +484,9 @@ namespace StickBlast
             return lines;
         }
 
-        private HashSet<BaseLine> HandleVerticalLinesByColumn(int column)
+        private HashSet<Grain> HandleVerticalLinesByColumn(int column)
         {
-            HashSet<BaseLine> lines = new HashSet<BaseLine>();
+            HashSet<Grain> lines = new HashSet<Grain>();
 
             for (int i = 0; i < GameConfigs.Instance.BaseGridSize.y - 1; i++)
             {
@@ -565,7 +565,7 @@ namespace StickBlast
             return true;
         }
 
-        private BaseLine HandleLineRetrieval(int x, int y, LineDirection direction)
+        private Grain HandleLineRetrieval(int x, int y, LineDirection direction)
         {
             return lines.SingleOrDefault(p => p.coordinate == new Vector2Int(x, y) && p.lineDirection == direction);
         }
@@ -576,7 +576,7 @@ namespace StickBlast
         }
 
 
-        public void HandleItemPlacement(List<BaseLine> lines)
+        public void HandleItemPlacement(List<Grain> lines)
         {
             if (lines == null)
                 return;

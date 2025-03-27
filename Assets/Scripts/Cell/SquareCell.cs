@@ -9,7 +9,7 @@ using UnityEngine.Audio;
 
 namespace StickBlast
 {
-    public class GridCell : MonoBehaviour
+    public class SquareCell : MonoBehaviour
     {
         [SerializeField]
         public BlastParticle blastParticlePrefab;
@@ -21,7 +21,7 @@ namespace StickBlast
         private Color hideColor = new Color(0, 0, 0, 0);
         private Tween blinkTween;
 
-        private HashSet<BaseLine> gridLines;
+        private HashSet<Grain> gridLines;
         public bool IsOccupied;
         private bool IsHovered;
         private bool hasPlayedScaleAnimation;
@@ -46,11 +46,11 @@ namespace StickBlast
             }
         }
 
-        public void Initialize(Vector2Int coordinate, BaseLine topLine, BaseLine rightLine, BaseLine bottomLine, BaseLine leftLine)
+        public void Initialize(Vector2Int coordinate, Grain topLine, Grain rightLine, Grain bottomLine, Grain leftLine)
         {
             this.coordinate = coordinate;
 
-            gridLines = new HashSet<BaseLine>
+            gridLines = new HashSet<Grain>
             {
                 topLine,
                 rightLine,
@@ -96,7 +96,7 @@ namespace StickBlast
             if (!hasPlayedScaleAnimation)
             {
                 transform.localScale = Vector3.zero;
-                transform.DOScale(Vector3.one, 1f)
+                transform.DOScale(Vector3.one, 0.25f)
                     .SetEase(Ease.Linear);
                 hasPlayedScaleAnimation = true;
             }
@@ -173,7 +173,7 @@ namespace StickBlast
             }
         }
 
-        public bool HasLine(BaseLine line)
+        public bool HasLine(Grain line)
         {
             return gridLines.Contains(line);
         }

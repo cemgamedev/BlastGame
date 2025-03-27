@@ -19,7 +19,7 @@ namespace StickBlast
         void OnDragEnd(Vector2 position);
     }
 
-    public class Moveable : MonoBehaviour, IMoveable, IDraggable
+    public class MoverPiece : MonoBehaviour, IMoveable, IDraggable
     {
         [SerializeField]
         private LayerMask layerMask;
@@ -28,7 +28,7 @@ namespace StickBlast
         // private Vector3 startPosition;
 
         // private Item item;
-        private ItemTile itemTile;
+        private ItemFeatureProvider itemTile;
         private bool canMove = true;
         
         public bool CanMove 
@@ -40,7 +40,7 @@ namespace StickBlast
         private void Start()
         {
             // startPosition = transform.position;
-            itemTile = GetComponent<ItemTile>();
+            itemTile = GetComponent<ItemFeatureProvider>();
         }
 
         public void OnStartMove()
@@ -137,7 +137,7 @@ namespace StickBlast
         //
         //         var myTile = (MyTile)tile;
         //
-        //         var hit = myTile.Moveable.Hit();
+        //         var hit = myTile.MoverPiece.Hit();
         //         if (!hit)
         //         {
         //             allowSetToGrid = false;
@@ -165,7 +165,7 @@ namespace StickBlast
         //             continue;
         //
         //         var myTile = (MyTile)tile;
-        //         myTile.Moveable.SetPositionToHit();
+        //         myTile.MoverPiece.SetPositionToHit();
         //     }
         // }
 
@@ -175,7 +175,7 @@ namespace StickBlast
         //     {
         //         if (!tile.gameObject.activeSelf) continue;
         //         var myTile = (MyTile)tile;
-        //         myTile.Moveable.BackToStartPosition();
+        //         myTile.MoverPiece.BackToStartPosition();
         //     }
         // }
 

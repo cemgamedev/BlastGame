@@ -41,7 +41,7 @@ namespace StickBlast.Implementation
         {
             if (CommonGameAssets.Instance == null)
             {
-                Debug.LogError("CommonGameAssets is not initialized!");
+                Debug.LogError("ItemCollectionCustomAsset is not initialized!");
                 return;
             }
             HandleItemSpawn();
@@ -51,7 +51,7 @@ namespace StickBlast.Implementation
         {
             if (CommonGameAssets.Instance == null)
             {
-                Debug.LogError("CommonGameAssets is not initialized!");
+                Debug.LogError("ItemCollectionCustomAsset is not initialized!");
                 return;
             }
 

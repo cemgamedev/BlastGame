@@ -20,13 +20,13 @@ namespace StickBlast
 
         [Header("Line")]
         [SerializeField]
-        private ItemLine linePrefab;
+        private ItemGrain linePrefab;
 
         [SerializeField]
         private Transform linesContent;
 
         [SerializeField]
-        private List<ItemLine> lines;
+        private List<ItemGrain> lines;
 
         public ItemTypes ItemType => itemType;
         
@@ -35,8 +35,8 @@ namespace StickBlast
         private Vector3 spawnPosition;
         private Vector2 offset;
 
-        private List<ItemTile> tiles = new List<ItemTile>();
-        private List<BaseLine> baseLinesHit;
+        private List<ItemFeatureProvider> tiles = new List<ItemFeatureProvider>();
+        private List<Grain> baseLinesHit;
 
         private bool canPlaced;
         private bool canTouch = true;
@@ -76,7 +76,7 @@ namespace StickBlast
             {
                 if (c.gameObject.activeSelf)
                 {
-                    var tile = c.GetComponent<ItemTile>();
+                    var tile = c.GetComponent<ItemFeatureProvider>();
                     if (tile == null) continue;
 
                     tile.SetItem(this);
@@ -122,7 +122,7 @@ namespace StickBlast
             foreach (Transform c in linesContent)
                 Destroy(c.gameObject);
 
-            lines = new List<ItemLine>();
+            lines = new List<ItemGrain>();
             for (int i = tiles.Count - 1; i >= 0; i--)
             {
                 var tile = tiles[i];
@@ -131,21 +131,21 @@ namespace StickBlast
 
                 if (right && right.gameObject.activeSelf)
                 {
-                    DrawLine((ItemTile)tile, (ItemTile)right, LineDirection.Horizontal);
+                    DrawLine((ItemFeatureProvider)tile, (ItemFeatureProvider)right, LineDirection.Horizontal);
                 }
 
                 var up = tile.GetNeighbour(Direction.Up);
 
                 if (up && up.gameObject.activeSelf)
                 {
-                    DrawLine((ItemTile)tile, (ItemTile)up, LineDirection.Vertical);
+                    DrawLine((ItemFeatureProvider)tile, (ItemFeatureProvider)up, LineDirection.Vertical);
                 }
             }
 
             linesContent.transform.localPosition = new Vector3(linesContent.transform.localPosition.x, linesContent.transform.localPosition.y, 0.1f);
         }
 
-        private void DrawLine(ItemTile tileA, ItemTile tileB, LineDirection lineDirection)
+        private void DrawLine(ItemFeatureProvider tileA, ItemFeatureProvider tileB, LineDirection lineDirection)
         {
             if (tileA == null || tileB == null) return;
 
@@ -266,9 +266,9 @@ namespace StickBlast
                 canPlaced = false;
         }
 
-        private List<BaseLine> GetBaseLineHits()
+        private List<Grain> GetBaseLineHits()
         {
-            var list = new List<BaseLine>();
+            var list = new List<Grain>();
 
             foreach (var line in lines)
             {
@@ -276,7 +276,7 @@ namespace StickBlast
 
                 if (hit && hit.transform != null)
                 {
-                    var baseLine = hit.transform.GetComponent<BaseLine>();
+                    var baseLine = hit.transform.GetComponent<Grain>();
                     if (baseLine.lineDirection == line.lineDirection)
                         list.Add(baseLine);
                 }

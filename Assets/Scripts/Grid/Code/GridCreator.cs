@@ -39,14 +39,14 @@ namespace StickBlast.Grid
         {
             var prefab = GetPrefab(gridType, setting);
 
-            //Create GridManager Object
+            //Create GridService Object
             var gridManager = new GameObject
             {
                 transform =
                 {
                     name = $"Grid {gridType} [{size.x},{size.y}]"
                 }
-            }.AddComponent<GridManager>();
+            }.AddComponent<GridService>();
 
             //Create Tiles
             var tiles = new List<TileController>();
@@ -195,7 +195,7 @@ namespace StickBlast.Grid
             Object.DestroyImmediate(pivotHelper);
         }
 
-        private void SetNeighbor(GridManager manager, GridType gridType)
+        private void SetNeighbor(GridService manager, GridType gridType)
         {
             var length = Enum.GetNames(typeof(Direction)).Length;
             foreach (var tile in manager.Tiles)

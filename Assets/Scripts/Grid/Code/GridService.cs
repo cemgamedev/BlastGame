@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace StickBlast.Grid
 {
-    public class GridManager : MonoBehaviour
+    public class GridService : MonoBehaviour
     {
         public List<TileController> Tiles => listTile;
         [SerializeField] private List<TileController> listTile;

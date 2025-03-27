@@ -7,9 +7,9 @@ using StickBlast.Models;
 
 namespace StickBlast
 {
-    public class ItemTile:TileController
+    public class ItemFeatureProvider:TileController
     {
-        public Moveable Moveable { get; private set; }
+        public MoverPiece Moveable { get; private set; }
         
         public Item Item { get; private set; }
        
@@ -23,7 +23,7 @@ namespace StickBlast
             startPosition = transform.position;
             spriteRenderer = GetComponent<SpriteRenderer>();
             
-            Moveable = GetComponent<Moveable>();
+            Moveable = GetComponent<MoverPiece>();
             collider2d = GetComponent<Collider2D>();
         }
 

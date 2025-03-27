@@ -13,7 +13,7 @@ namespace StickBlast.Implementation
         private LayerMask layerMask;
 
         private Vector2 offset;
-        private ItemTile itemTile;
+        private ItemFeatureProvider itemTile;
         private bool canMove = true;
         private IItemAnimationController animationController;
         private bool isDragging;
@@ -27,7 +27,7 @@ namespace StickBlast.Implementation
 
         private void Start()
         {
-            itemTile = GetComponent<ItemTile>();
+            itemTile = GetComponent<ItemFeatureProvider>();
             animationController = ServiceLocator.Instance.GetItemAnimationController();
         }
 
