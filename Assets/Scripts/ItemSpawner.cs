@@ -19,8 +19,6 @@ namespace DefaultNamespace
 	public class ItemSpawner : Singleton<ItemSpawner>, IItemSpawner
 	{
 		[SerializeField]
-		private Transform spawnPoint;
-		[SerializeField]
 		private Transform[] itemPoints;
 		[SerializeField]
 		private Transform boardTransform;
@@ -32,7 +30,6 @@ namespace DefaultNamespace
 		{
 			animationController = new ItemAnimationController();
 			((ItemAnimationController)animationController).HandleInitialization();
-			((ItemAnimationController)animationController).SetSpawnPoint(spawnPoint.position);
 		}
 
 		private void OnDestroy()
@@ -80,53 +77,18 @@ namespace DefaultNamespace
 			}
 			items = new List<Item>();
 
-			// Get board boundaries
-			Renderer boardRenderer = boardTransform.GetComponent<Renderer>();
-			if (boardRenderer == null)
+			// Spawn items at itemPoints positions
+			for (int i = 0; i < itemPrefabs.Count && i < itemPoints.Length; i++)
 			{
-				Debug.LogError("Board does not have a Renderer component!");
-				return;
-			}
-
-			Vector3 boardMin = boardRenderer.bounds.min;
-			Vector3 boardMax = boardRenderer.bounds.max;
-
-			// Use the first itemPoint's Y position to ensure consistent Y alignment
-			float spawnY = itemPoints[0].position.y;
-
-			// Calculate spacing and start position based on board size
-			float boardWidth = boardMax.x - boardMin.x;
-
-			// Get the main SpriteRenderer of the first prefab to calculate size
-			SpriteRenderer firstItemRenderer = GetMainSpriteRenderer(itemPrefabs[0].gameObject);
-			if (firstItemRenderer == null)
-			{
-				Debug.LogError("Could not find SpriteRenderer for item!");
-				return;
-			}
-
-			float itemWidth = firstItemRenderer.bounds.size.x;
-			float spacing = itemWidth * 1.2f; // Add a little padding
-			float startX = boardMin.x + (itemWidth / 2);
-
-			foreach (var itemPrefab in itemPrefabs)
-			{
+				var itemPrefab = itemPrefabs[i];
 				if (itemPrefab == null) continue;
 
-				// Calculate X position
-				float spawnX = startX + (items.Count * spacing);
-
-				// Check if the item will be within board boundaries
-				if (spawnX + (itemWidth / 2) > boardMax.x)
-				{
-					Debug.LogWarning("Too many items to spawn within board boundaries!");
-					break;
-				}
-
 				var item = Instantiate(itemPrefab);
-
-				// Set position with the consistent Y and constrained X
-				item.transform.position = new Vector3(spawnX, spawnY, itemPoints[0].position.z);
+				Vector3 spawnPos = itemPoints[i].position;
+				
+				// Set initial position and spawn position
+				item.transform.position = spawnPos;
+				item.SetSpawnPosition(spawnPos);
 
 				// Subscribe to item destruction using UniRx
 				item.OnItemDestroyed
@@ -136,13 +98,11 @@ namespace DefaultNamespace
 				items.Add(item);
 			}
 
-			animationController.HandleItemAnimation(items, itemPoints)
-				.Subscribe(_ =>
-				{
-					foreach (var item in items)
-						item.SetCanTouch();
-				})
-				.AddTo(disposables);
+			// Enable touch for all items immediately since they're already in position
+			foreach (var item in items)
+			{
+				item.SetCanTouch();
+			}
 		}
 
 		public void HandleItemDestruction(Item item)

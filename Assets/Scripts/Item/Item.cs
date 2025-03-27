@@ -32,6 +32,7 @@ namespace StickBlast
         
         private Vector2 startScale;
         private Vector3 startPosition;
+        private Vector3 spawnPosition;
         private Vector2 offset;
 
         private List<ItemTile> tiles = new List<ItemTile>();
@@ -49,16 +50,23 @@ namespace StickBlast
             
             transform.localScale = startScale;
             startPosition = transform.position;
+            spawnPosition = transform.position;
 
             SetTilesList();
             DrawLines();
             Recolor(ColorTypes.ItemStill);
         }
 
+        public void SetSpawnPosition(Vector3 position)
+        {
+            spawnPosition = position;
+            startPosition = position;
+        }
+
         public void SetCanTouch()
         {
             canTouch = true;
-            startPosition = transform.position;
+            startPosition = spawnPosition;
         }
 
         // Sets Item tiles
