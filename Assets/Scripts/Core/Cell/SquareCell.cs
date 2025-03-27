@@ -33,13 +33,14 @@ namespace StickBlast
         private bool IsHovered;
         private bool hasPlayedScaleAnimation;
         private bool hasPlayedBlastEffect;
+        private Vector3 squareScale = new Vector3(0.75f, 0.75f, 0.75f);
 
         private void Awake()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
             if (starRenderer != null)
             {
-                starRenderer.enabled = false; // Ensure star starts disabled
+                starRenderer.enabled = false; 
             }
             else
             {
@@ -67,7 +68,7 @@ namespace StickBlast
             {
                 Debug.Log("Star renderer found, enabling...");
                 starRenderer.enabled = true;
-                starRenderer.gameObject.SetActive(true); // Make sure the game object is also active
+                starRenderer.gameObject.SetActive(true); 
             }
             else
             {
@@ -142,7 +143,7 @@ namespace StickBlast
             if (!hasPlayedScaleAnimation)
             {
                 transform.localScale = Vector3.zero;
-                transform.DOScale(Vector3.one, 0.25f)
+                transform.DOScale(squareScale , 0.25f)
                     .SetEase(Ease.Linear);
                 hasPlayedScaleAnimation = true;
             }

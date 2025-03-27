@@ -5,6 +5,8 @@ using BlastRoot.Utility;
 using UnityEngine;
 using StickBlast.Models;
 using System.Collections;
+using TMPro;
+using DG.Tweening;
 
 namespace StickBlast
 {
@@ -16,13 +18,61 @@ namespace StickBlast
         [SerializeField]
         private Transform content;
 
+        [SerializeField]
+        private TextMeshProUGUI comboText;
+
+        private int currentCombo = 0;
+        private Sequence comboSequence;
         
         HashSet<Vector2Int> coordinates = new HashSet<Vector2Int>();
-
         private List<SquareCell> cells = new List<SquareCell>();
+
+        private void OnDestroy()
+        {
+            if (comboSequence != null)
+            {
+                comboSequence.Kill();
+                comboSequence = null;
+            }
+        }
+
+        private void PlayComboAnimation()
+        {
+            currentCombo++;
+            if (comboText != null)
+            {
+                if (comboSequence != null)
+                {
+                    comboSequence.Kill();
+                }
+
+                comboText.text = $"COMBO {currentCombo}X";
+                comboText.gameObject.SetActive(true);
+                comboText.transform.localScale = Vector3.zero;
+                comboText.alpha = 1;
+
+                comboSequence = DOTween.Sequence();
+                
+                // Büyüme animasyonu
+                comboSequence.Append(comboText.transform.DOScale(1.5f, 0.7f).SetEase(Ease.OutElastic));
+                
+                // Kısa bekleme
+                comboSequence.AppendInterval(0.2f);
+                
+                // Küçülme animasyonu
+                comboSequence.Append(comboText.transform.DOScale(0f, 0.5f).SetEase(Ease.InBack));
+                
+                // Tamamlandığında kapat
+                comboSequence.OnComplete(() => {
+                    comboText.gameObject.SetActive(false);
+                    comboText.transform.localScale = Vector3.zero;
+                });
+            }
+        }
+
         private void Start()
         {
-            // Star activation moved to SetCells()
+            currentCombo = 0; // Combo sayacını sıfırla
         }
         public void SetCells()
         {
@@ -146,6 +196,7 @@ namespace StickBlast
         }
         private IEnumerator PlayRowBlastEffect(List<SquareCell> row, float delayBetweenBlasts)
         {
+            PlayComboAnimation();
             for (int i = 0; i < row.Count; i++)
             {
                 var cell = row[i];
@@ -154,7 +205,6 @@ namespace StickBlast
                 int currentIndex = i;
                 cell.PlayBlastEffect(currentIndex * delayBetweenBlasts, () => { });
                 
-                // Check if cell has star and play particle effect
                 if (cell.starRenderer != null && cell.starRenderer.enabled)
                 {
                     cell.PlayStarBonusParticle();
@@ -166,6 +216,7 @@ namespace StickBlast
 
         private IEnumerator PlayColumnBlastEffect(List<SquareCell> column, float delayBetweenBlasts)
         {
+            PlayComboAnimation();
             for (int i = 0; i < column.Count; i++)
             {
                 var cell = column[i];
@@ -174,7 +225,6 @@ namespace StickBlast
                 int currentIndex = i;
                 cell.PlayBlastEffect(currentIndex * delayBetweenBlasts, () => { });
                 
-                // Check if cell has star and play particle effect
                 if (cell.starRenderer != null && cell.starRenderer.enabled)
                 {
                     cell.PlayStarBonusParticle();
