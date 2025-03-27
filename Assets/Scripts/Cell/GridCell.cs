@@ -5,13 +5,14 @@ using Ebleme;
 using UnityEngine;
 using StickBlast.Models;
 using DG.Tweening;
+using UnityEngine.Audio;
 
 namespace StickBlast
 {
     public class GridCell : MonoBehaviour
     {
         [SerializeField]
-        private BlastParticle blastParticlePrefab;
+        public BlastParticle blastParticlePrefab;
 
         private Vector2Int coordinate;
         public Vector2Int Coordinate => coordinate;
@@ -124,10 +125,11 @@ namespace StickBlast
             
             // Add blast effect after shake
             sequence.AppendCallback(() => {
-                var blastParticle = Instantiate(blastParticlePrefab, transform.position, Quaternion.identity);
-                blastParticle.Play(GameConfigs.Instance.ActiveColor, transform.position, sequenceDelay, onComplete);
-            });
-        }
+                blastParticlePrefab.Play(GameConfigs.Instance.ActiveColor, transform.position, sequenceDelay, onComplete);
+				//blastParticlePrefab.GetComponent<AudioSource>().Play();
+			});
+          
+		}
 
         public bool CanBeHovered()
         {

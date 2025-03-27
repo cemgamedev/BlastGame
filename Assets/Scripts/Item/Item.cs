@@ -8,6 +8,7 @@ using StickBlast.Grid;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using StickBlast.Models;
+using DG.Tweening;
 
 namespace StickBlast
 {
@@ -172,7 +173,8 @@ namespace StickBlast
 
         public void SetMovingScale()
         {
-            transform.localScale = GameConfigs.Instance.ItemDragScale;
+            transform.DOScale(GameConfigs.Instance.ItemDragScale,0.15f)
+                .SetEase(Ease.InElastic);
         }
 
         public bool AllowSetToGrid()

@@ -1,4 +1,4 @@
-// maebleme2
+ï»¿// maebleme2
 
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +6,7 @@ using Ebleme;
 using Ebleme.Utility;
 using UnityEngine;
 using StickBlast.Models;
+using System.Collections;
 
 namespace StickBlast
 {
@@ -78,13 +79,11 @@ namespace StickBlast
         [Sirenix.OdinInspector.Button]
 		public void CheckBlastCondition()
 		{
-			float delayBetweenBlasts = 0.2f; // 0.2 saniye gecikme
+			float delayBetweenBlasts = 0.1f; // Sesler arasÄ±nda gecikme
 
-			// Sat?r ve sütunlar? kontrol etmek için geçici listeler
 			Dictionary<int, List<GridCell>> rows = new Dictionary<int, List<GridCell>>();
 			Dictionary<int, List<GridCell>> columns = new Dictionary<int, List<GridCell>>();
 
-			// GridCell'leri sat?r ve sütunlara göre gruplama
 			foreach (var cell in cells)
 			{
 				if (!rows.ContainsKey(cell.Coordinate.y))
@@ -96,34 +95,49 @@ namespace StickBlast
 				columns[cell.Coordinate.x].Add(cell);
 			}
 
-			// Sat?rlar? kontrol et
+			// SatÄ±rlar (saÄŸdan sola)
 			foreach (var row in rows.Values)
 			{
 				if (row.Count >= 5 && row.All(c => c.IsOccupied))
 				{
-					for (int i = 0; i < row.Count; i++)
-					{
-						row[i].PlayBlastEffect(i * delayBetweenBlasts, () => {
-							// Patlama sonras? i?lemler
-						});
-					}
+					StartCoroutine(PlayRowBlastEffect(row, delayBetweenBlasts));
 				}
 			}
 
-			// Sütunlar? kontrol et
+			// SÃ¼tunlar (aÅŸaÄŸÄ±dan yukarÄ±)
 			foreach (var column in columns.Values)
 			{
 				if (column.Count >= 5 && column.All(c => c.IsOccupied))
 				{
-					for (int i = 0; i < column.Count; i++)
-					{
-						column[i].PlayBlastEffect(i * delayBetweenBlasts, () => {
-							// Patlama sonras? i?lemler
-						});
-					}
+					StartCoroutine(PlayColumnBlastEffect(column, delayBetweenBlasts));
 				}
 			}
 		}
+
+		private IEnumerator PlayRowBlastEffect(List<GridCell> row, float delayBetweenBlasts)
+		{
+			for (int i = 0; i < row.Count; i++)
+			{
+				var audioSource = row[i].blastParticlePrefab.GetComponent<AudioSource>();
+				audioSource.Play();
+				int currentIndex = i;
+				row[i].PlayBlastEffect(currentIndex * delayBetweenBlasts, () => { });
+				yield return new WaitForSeconds(delayBetweenBlasts); // Delay before the next sound plays
+			}
+		}
+
+		private IEnumerator PlayColumnBlastEffect(List<GridCell> column, float delayBetweenBlasts)
+		{
+			for (int i = 0; i < column.Count; i++)
+			{
+				var audioSource = column[i].blastParticlePrefab.GetComponent<AudioSource>();
+				audioSource.Play();
+				int currentIndex = i;
+				column[i].PlayBlastEffect(currentIndex * delayBetweenBlasts, () => { });
+				yield return new WaitForSeconds(delayBetweenBlasts); // Delay before the next sound plays
+			}
+		}
+
 		public void HoverCells()
         {
             foreach (var cell in cells)

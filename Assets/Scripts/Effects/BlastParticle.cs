@@ -31,7 +31,7 @@ namespace StickBlast
             sequence.OnComplete(() => {
                 particleSystem.Play();
                 // Particle system bittiğinde objeyi yok et
-                Destroy(gameObject, particleSystem.main.duration);
+                //Destroy(gameObject, particleSystem.main.duration);
                 onComplete?.Invoke();
             });
         }

@@ -175,6 +175,14 @@ PrefabInstance:
       propertyPath: playOnAwake
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3952877258090599648, guid: 2d2dc4db83f8e7d47a43c1d641d30a95, type: 3}
+      propertyPath: m_Resource
+      value: 
+      objectReference: {fileID: 8300000, guid: 7fb954e1c1961644d85f884b946f53b0, type: 3}
+    - target: {fileID: 3952877258090599648, guid: 2d2dc4db83f8e7d47a43c1d641d30a95, type: 3}
+      propertyPath: m_audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 7fb954e1c1961644d85f884b946f53b0, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
