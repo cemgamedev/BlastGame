@@ -21,11 +21,23 @@ namespace StickBlast
         [SerializeField]
         private TextMeshProUGUI comboText;
 
+        [SerializeField]
+        private TextMeshProUGUI scoreText;
+
         private int currentCombo = 0;
+        private int currentScore = 0;
         private Sequence comboSequence;
+        private Sequence scoreSequence;
+        
+        private const int ITEM_POINTS = 2;        // Tek item yerleştirme
+        private const int ITEM_MERGE_POINTS = 4;  // İki item birleşme
+        private const int GRID_PLACEMENT_POINTS = 2;    // Grid'e yerleştirme
+        private const int CELL_COMPLETE_POINTS = 16;    // Grid cell tamamlama
+        private const int BLAST_POINTS = 50;            // Blast puanı
         
         HashSet<Vector2Int> coordinates = new HashSet<Vector2Int>();
         private List<SquareCell> cells = new List<SquareCell>();
+        private HashSet<Vector2Int> completedCells = new HashSet<Vector2Int>(); // Tamamlanan hücreleri takip etmek için
 
         private void OnDestroy()
         {
@@ -33,6 +45,11 @@ namespace StickBlast
             {
                 comboSequence.Kill();
                 comboSequence = null;
+            }
+            if (scoreSequence != null)
+            {
+                scoreSequence.Kill();
+                scoreSequence = null;
             }
         }
 
@@ -54,13 +71,13 @@ namespace StickBlast
                 comboSequence = DOTween.Sequence();
                 
                 // Büyüme animasyonu
-                comboSequence.Append(comboText.transform.DOScale(1.5f, 0.7f).SetEase(Ease.OutElastic));
+                comboSequence.Append(comboText.transform.DOScale(1.5f, 0.3f).SetEase(Ease.OutElastic));
                 
                 // Kısa bekleme
                 comboSequence.AppendInterval(0.2f);
                 
                 // Küçülme animasyonu
-                comboSequence.Append(comboText.transform.DOScale(0f, 0.5f).SetEase(Ease.InBack));
+                comboSequence.Append(comboText.transform.DOScale(0f, 0.2f).SetEase(Ease.InBack));
                 
                 // Tamamlandığında kapat
                 comboSequence.OnComplete(() => {
@@ -72,8 +89,37 @@ namespace StickBlast
 
         private void Start()
         {
-            currentCombo = 0; // Combo sayacını sıfırla
+            currentCombo = 0;
+            currentScore = 0;
+            completedCells.Clear(); // Yeni oyun başladığında tamamlanan hücreleri sıfırla
+            UpdateScoreText();
         }
+
+        private void UpdateScoreText()
+        {
+            if (scoreText != null)
+            {
+                scoreText.text = $"Score: {currentScore}";
+                
+                // Score text animasyonu
+                if (scoreSequence != null)
+                {
+                    scoreSequence.Kill();
+                }
+
+                scoreSequence = DOTween.Sequence();
+                scoreSequence.Append(scoreText.transform.DOScale(1.2f, 0.2f).SetEase(Ease.OutBack));
+                scoreSequence.Append(scoreText.transform.DOScale(1f, 0.2f).SetEase(Ease.InBack));
+            }
+        }
+
+        private void ScoreHandler(int points)
+        {
+            currentScore += points;
+            UpdateScoreText();
+            Debug.Log($"Score added: {points}, Total: {currentScore}");
+        }
+
         public void SetCells()
         {
             GenerateCoordinates();
@@ -123,9 +169,16 @@ namespace StickBlast
                 if (cell.CheckLineOccupation())
                 {
                     cell.SetOccupied();
+                    
+                    // Eğer bu hücre daha önce tamamlanmamışsa puan ver
+                    if (!completedCells.Contains(cell.Coordinate))
+                    {
+                        completedCells.Add(cell.Coordinate);
+                        ScoreHandler(CELL_COMPLETE_POINTS);
+                    }
+                    
                     CheckBlastCondition();
-
-				}
+                }
             }
         }
         [Sirenix.OdinInspector.Button]
@@ -197,6 +250,8 @@ namespace StickBlast
         private IEnumerator PlayRowBlastEffect(List<SquareCell> row, float delayBetweenBlasts)
         {
             PlayComboAnimation();
+            ScoreHandler(BLAST_POINTS * currentCombo); // Combo'ya göre bonus puan
+
             for (int i = 0; i < row.Count; i++)
             {
                 var cell = row[i];
@@ -217,6 +272,8 @@ namespace StickBlast
         private IEnumerator PlayColumnBlastEffect(List<SquareCell> column, float delayBetweenBlasts)
         {
             PlayComboAnimation();
+            ScoreHandler(BLAST_POINTS * currentCombo); // Combo'ya göre bonus puan
+
             for (int i = 0; i < column.Count; i++)
             {
                 var cell = column[i];
@@ -260,6 +317,21 @@ namespace StickBlast
         public List<SquareCell> GetCells()
         {
             return cells;
+        }
+
+        public void OnItemPlaced()
+        {
+            ScoreHandler(ITEM_POINTS);
+        }
+
+        public void OnItemsMerged()
+        {
+            ScoreHandler(ITEM_MERGE_POINTS);
+        }
+
+        public void OnGridPlacement()
+        {
+            ScoreHandler(GRID_PLACEMENT_POINTS);
         }
     }
 }

@@ -24,22 +24,25 @@ namespace StickBlast
         [SerializeField]
         private LayerMask layerMask;
 
+        [SerializeField]
+        private GridGenerator gridGenerator;
+
         private Vector2 offset;
         // private Vector3 startPosition;
 
         // private Item item;
         private ItemFeatureProvider itemTile;
         private bool canMove = true;
-        
-        public bool CanMove 
-        { 
+
+        public bool CanMove
+        {
             get => canMove;
             set => canMove = value;
         }
 
         private void Start()
         {
-            // startPosition = transform.position;
+            this.gridGenerator = GameObject.FindAnyObjectByType<GridGenerator>();
             itemTile = GetComponent<ItemFeatureProvider>();
         }
 
@@ -68,6 +71,10 @@ namespace StickBlast
             {
                 itemTile.Item.AssingItemTilesToGridTiles();
                 BaseGrid.Instance.CheckGrid();
+                if (gridGenerator != null)
+                {
+                    gridGenerator.OnGridPlacement();
+                }
             }
             else
             {
