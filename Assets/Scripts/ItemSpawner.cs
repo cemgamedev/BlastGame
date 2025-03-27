@@ -8,6 +8,9 @@ using Ebleme.Utility;
 using StickBlast;
 using UnityEngine;
 using StickBlast.Models;
+using UniRx;
+using StickBlast.Core.Interfaces;
+using StickBlast.Implementation;
 
 namespace DefaultNamespace
 {
@@ -15,46 +18,6 @@ namespace DefaultNamespace
     {
         void HandleItemSpawn();
         void HandleItemDestruction(Item item);
-    }
-
-    public interface IItemAnimationController
-    {
-        void HandleItemAnimation(List<Item> items, Transform[] itemPoints, Action onComplete);
-    }
-
-    public class ItemAnimationController : IItemAnimationController
-    {
-        private Sequence sequence;
-
-        public ItemAnimationController()
-        {
-            // DOTween initialization moved to Awake
-        }
-
-        public void HandleInitialization()
-        {
-            sequence = DOTween.Sequence();
-        }
-
-        public void HandleItemAnimation(List<Item> items, Transform[] itemPoints, Action onComplete)
-        {
-            if (sequence == null)
-            {
-                sequence = DOTween.Sequence();
-            }
-
-            sequence.Kill();
-
-            int index = 0;
-            foreach (var item in items)
-            {
-                sequence.Append(item.transform.DOMove(itemPoints[index].position, GameConfigs.Instance.ItemMoveAnimDuration));
-                sequence.AppendInterval(GameConfigs.Instance.ItemMoveAnimInterval);
-                index++;
-            }
-
-            sequence.OnComplete(() => onComplete?.Invoke());
-        }
     }
 
     public class ItemSpawner : Singleton<ItemSpawner>, IItemSpawner
@@ -67,11 +30,18 @@ namespace DefaultNamespace
 
         private List<Item> items;
         private IItemAnimationController animationController;
+        private CompositeDisposable disposables = new CompositeDisposable();
 
         private void Awake()
         {
             animationController = new ItemAnimationController();
             ((ItemAnimationController)animationController).HandleInitialization();
+            ((ItemAnimationController)animationController).SetSpawnPoint(spawnPoint.position);
+        }
+
+        private void OnDestroy()
+        {
+            disposables.Dispose();
         }
 
         private void Start()
@@ -107,15 +77,22 @@ namespace DefaultNamespace
 
                 var item = Instantiate(itemPrefab);
                 item.transform.position = spawnPoint.position;
-                item.OnItemDestroyed += HandleItemDestruction;
+                
+                // Subscribe to item destruction using UniRx
+                item.OnItemDestroyed
+                    .Subscribe(HandleItemDestruction)
+                    .AddTo(disposables);
+                
                 items.Add(item);
             }
 
-            animationController.HandleItemAnimation(items, itemPoints, () =>
-            {
-                foreach (var item in items)
-                    item.SetCanTouch();
-            });
+            animationController.HandleItemAnimation(items, itemPoints)
+                .Subscribe(_ =>
+                {
+                    foreach (var item in items)
+                        item.SetCanTouch();
+                })
+                .AddTo(disposables);
         }
 
         public void HandleItemDestruction(Item item)

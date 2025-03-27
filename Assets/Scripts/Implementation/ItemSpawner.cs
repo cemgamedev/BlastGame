@@ -1,10 +1,14 @@
+using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using Ebleme;
 using Ebleme.Utility;
-using StickBlast.Core.DependencyInjection;
-using StickBlast.Core.Interfaces;
-using StickBlast.Models;
+using StickBlast;
 using UnityEngine;
+using StickBlast.Models;
+using UniRx;
+using StickBlast.Core.Interfaces;
+using StickBlast.Implementation;
 
 namespace StickBlast.Implementation
 {
@@ -17,11 +21,19 @@ namespace StickBlast.Implementation
         private Transform[] itemPoints;
 
         private List<Item> items;
-        private readonly IItemAnimationController animationController;
+        private IItemAnimationController animationController;
+        private CompositeDisposable disposables = new CompositeDisposable();
 
-        public ItemSpawner()
+        private void Awake()
         {
-            animationController = ServiceLocator.Instance.GetItemAnimationController();
+            animationController = new ItemAnimationController();
+            ((ItemAnimationController)animationController).HandleInitialization();
+            ((ItemAnimationController)animationController).SetSpawnPoint(spawnPoint.position);
+        }
+
+        private void OnDestroy()
+        {
+            disposables.Dispose();
         }
 
         private void Start()
@@ -31,13 +43,6 @@ namespace StickBlast.Implementation
                 Debug.LogError("CommonGameAssets is not initialized!");
                 return;
             }
-
-            // Spawn point'i animation controller'a aktar
-            if (spawnPoint != null)
-            {
-                ((ItemAnimationController)animationController).SetSpawnPoint(spawnPoint.position);
-            }
-
             HandleItemSpawn();
         }
 
@@ -64,15 +69,22 @@ namespace StickBlast.Implementation
 
                 var item = Instantiate(itemPrefab);
                 item.transform.position = spawnPoint.position;
-                item.OnItemDestroyed += HandleItemDestruction;
+                
+                // Subscribe to item destruction using UniRx
+                item.OnItemDestroyed
+                    .Subscribe(HandleItemDestruction)
+                    .AddTo(disposables);
+                
                 items.Add(item);
             }
 
-            animationController.HandleItemAnimation(items, itemPoints, () =>
-            {
-                foreach (var item in items)
-                    item.SetCanTouch();
-            });
+            animationController.HandleItemAnimation(items, itemPoints)
+                .Subscribe(_ =>
+                {
+                    foreach (var item in items)
+                        item.SetCanTouch();
+                })
+                .AddTo(disposables);
         }
 
         public void HandleItemDestruction(Item item)

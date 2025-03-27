@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using StickBlast.Models;
 using DG.Tweening;
+using UniRx;
 
 namespace StickBlast
 {
@@ -39,7 +40,8 @@ namespace StickBlast
         private bool canPlaced;
         private bool canTouch = true;
 
-        public event Action<Item> OnItemDestroyed; 
+        private Subject<Item> onItemDestroyedSubject = new Subject<Item>();
+        public IObservable<Item> OnItemDestroyed => onItemDestroyedSubject;
 
         private void Start()
         {
@@ -290,8 +292,7 @@ namespace StickBlast
                 BaseGrid.Instance.PutItemToGrid(baseLinesHit);
 
                 // Item ı yok eder
-                OnItemDestroyed?.Invoke(this);
-                Destroy(gameObject);
+                DestroyItem();
 
                 // Dolu olan Grid Cell leri kontrol eder. Ardından tüm Grid i kontrol eder.
                 BaseGrid.Instance.CheckCells(() =>
@@ -323,6 +324,12 @@ namespace StickBlast
                 return tiles[0].transform.position;
             }
             return transform.position;
+        }
+
+        public void DestroyItem()
+        {
+            onItemDestroyedSubject.OnNext(this);
+            Destroy(gameObject);
         }
     }
 }

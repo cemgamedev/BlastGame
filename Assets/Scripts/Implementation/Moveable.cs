@@ -2,6 +2,7 @@ using UnityEngine;
 using StickBlast.Core.Interfaces;
 using StickBlast.Models;
 using StickBlast.Core.DependencyInjection;
+using UniRx;
 
 namespace StickBlast.Implementation
 {
@@ -15,6 +16,7 @@ namespace StickBlast.Implementation
         private bool canMove = true;
         private IItemAnimationController animationController;
         private bool isDragging;
+        private CompositeDisposable disposables = new CompositeDisposable();
         
         public bool CanMove 
         { 
@@ -26,6 +28,11 @@ namespace StickBlast.Implementation
         {
             itemTile = GetComponent<ItemTile>();
             animationController = ServiceLocator.Instance.GetItemAnimationController();
+        }
+
+        private void OnDestroy()
+        {
+            disposables.Dispose();
         }
 
         public void OnStartMove()
@@ -57,18 +64,22 @@ namespace StickBlast.Implementation
             if (allowSetToGrid)
             {
                 var targetPosition = itemTile.Item.GetPosition();
-                animationController.HandleItemPlacement(transform, targetPosition, () =>
-                {
-                    itemTile.Item.AssingItemTilesToGridTiles();
-                    BaseGrid.Instance.CheckGrid();
-                });
+                animationController.HandleItemPlacement(transform, targetPosition)
+                    .Subscribe(_ =>
+                    {
+                        itemTile.Item.AssingItemTilesToGridTiles();
+                        BaseGrid.Instance.CheckGrid();
+                    })
+                    .AddTo(disposables);
             }
             else
             {
-                animationController.HandleItemSnap(transform, itemTile.Item.GetOriginalPosition(), () =>
-                {
-                    itemTile.Item.ReleaseAll();
-                });
+                animationController.HandleItemSnap(transform, itemTile.Item.GetOriginalPosition())
+                    .Subscribe(_ =>
+                    {
+                        itemTile.Item.ReleaseAll();
+                    })
+                    .AddTo(disposables);
             }
         }
 
