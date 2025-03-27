@@ -6,6 +6,7 @@ using UnityEngine;
 using StickBlast.Models;
 using DG.Tweening;
 using UnityEngine.Audio;
+using System.Collections;
 
 namespace StickBlast
 {
@@ -13,6 +14,12 @@ namespace StickBlast
     {
         [SerializeField]
         public BlastParticle blastParticlePrefab;
+
+        [SerializeField] 
+        public SpriteRenderer starRenderer;
+
+        [SerializeField] 
+        private ParticleSystem starBonusParticle;
 
         private Vector2Int coordinate;
         public Vector2Int Coordinate => coordinate;
@@ -30,6 +37,14 @@ namespace StickBlast
         private void Awake()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
+            if (starRenderer != null)
+            {
+                starRenderer.enabled = false; // Ensure star starts disabled
+            }
+            else
+            {
+                Debug.LogError("Star Renderer is not assigned in inspector!");
+            }
         }
 
         private void Start()
@@ -44,6 +59,37 @@ namespace StickBlast
                 blinkTween.Kill();
                 blinkTween = null;
             }
+        }
+        public void ActivateStar()
+        {
+            Debug.Log("ActivateStar called");
+            if (starRenderer != null)
+            {
+                Debug.Log("Star renderer found, enabling...");
+                starRenderer.enabled = true;
+                starRenderer.gameObject.SetActive(true); // Make sure the game object is also active
+            }
+            else
+            {
+                Debug.LogError("Star Renderer is null!");
+            }
+        }
+
+        public void PlayStarBonusParticle()
+        {
+            if (starBonusParticle != null)
+            {
+                starBonusParticle.gameObject.SetActive(true);
+                starBonusParticle.Play();
+                StartCoroutine(DisableParticleAfterPlay());
+            }
+        }
+
+        private IEnumerator DisableParticleAfterPlay()
+        {
+            starRenderer.gameObject.SetActive(false);
+            yield return new WaitForSeconds(starBonusParticle.main.duration);
+            starBonusParticle.gameObject.SetActive(false);
         }
 
         public void Initialize(Vector2Int coordinate, Grain topLine, Grain rightLine, Grain bottomLine, Grain leftLine)

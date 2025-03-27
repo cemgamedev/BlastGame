@@ -1,6 +1,4 @@
-﻿// maebleme2
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using BlastRoot;
 using BlastRoot.Utility;
@@ -22,11 +20,15 @@ namespace StickBlast
         HashSet<Vector2Int> coordinates = new HashSet<Vector2Int>();
 
         private List<SquareCell> cells = new List<SquareCell>();
-
+        private void Start()
+        {
+            // Star activation moved to SetCells()
+        }
         public void SetCells()
         {
             GenerateCoordinates();
             SpawnCells();
+            this.ActivateRandomStarCell(); // Moved here after cells are created
         }
 
         private void GenerateCoordinates()
@@ -113,32 +115,76 @@ namespace StickBlast
 				}
 			}
 		}
+        [Sirenix.OdinInspector.Button]
+        public void ActivateRandomStarCell()
+        {
+            if (cells == null || cells.Count == 0)
+            {
+                Debug.LogWarning("No cells available for star activation");
+                return;
+            }
 
-		private IEnumerator PlayRowBlastEffect(List<SquareCell> row, float delayBetweenBlasts)
-		{
-			for (int i = 0; i < row.Count; i++)
-			{
-				var audioSource = row[i].blastParticlePrefab.GetComponent<AudioSource>();
-				audioSource.Play();
-				int currentIndex = i;
-				row[i].PlayBlastEffect(currentIndex * delayBetweenBlasts, () => { });
-				yield return new WaitForSeconds(delayBetweenBlasts); // Delay before the next sound plays
-			}
-		}
+            var randomCell = cells[Random.Range(0, cells.Count)];
+            Debug.Log($"Activating star on cell at coordinate: {randomCell.Coordinate}");
 
-		private IEnumerator PlayColumnBlastEffect(List<SquareCell> column, float delayBetweenBlasts)
-		{
-			for (int i = 0; i < column.Count; i++)
-			{
-				var audioSource = column[i].blastParticlePrefab.GetComponent<AudioSource>();
-				audioSource.Play();
-				int currentIndex = i;
-				column[i].PlayBlastEffect(currentIndex * delayBetweenBlasts, () => { });
-				yield return new WaitForSeconds(delayBetweenBlasts); // Delay before the next sound plays
-			}
-		}
+            randomCell.ActivateStar();
+            Debug.Log("Star activated");
 
-		public void HoverCells()
+            if (IsInBlastRowOrColumn(randomCell))
+            {
+                Debug.Log("Cell is in blast row/column, playing particle effect");
+                randomCell.PlayStarBonusParticle();
+            }
+        }
+        private bool IsInBlastRowOrColumn(SquareCell targetCell)
+        {
+            var row = cells.Where(c => c.Coordinate.y == targetCell.Coordinate.y).ToList();
+            var column = cells.Where(c => c.Coordinate.x == targetCell.Coordinate.x).ToList();
+
+            return (row.Count >= 5 && row.All(c => c.IsOccupied)) ||
+                   (column.Count >= 5 && column.All(c => c.IsOccupied));
+        }
+        private IEnumerator PlayRowBlastEffect(List<SquareCell> row, float delayBetweenBlasts)
+        {
+            for (int i = 0; i < row.Count; i++)
+            {
+                var cell = row[i];
+                var audioSource = cell.blastParticlePrefab.GetComponent<AudioSource>();
+                audioSource.Play();
+                int currentIndex = i;
+                cell.PlayBlastEffect(currentIndex * delayBetweenBlasts, () => { });
+                
+                // Check if cell has star and play particle effect
+                if (cell.starRenderer != null && cell.starRenderer.enabled)
+                {
+                    cell.PlayStarBonusParticle();
+                }
+                
+                yield return new WaitForSeconds(delayBetweenBlasts);
+            }
+        }
+
+        private IEnumerator PlayColumnBlastEffect(List<SquareCell> column, float delayBetweenBlasts)
+        {
+            for (int i = 0; i < column.Count; i++)
+            {
+                var cell = column[i];
+                var audioSource = cell.blastParticlePrefab.GetComponent<AudioSource>();
+                audioSource.Play();
+                int currentIndex = i;
+                cell.PlayBlastEffect(currentIndex * delayBetweenBlasts, () => { });
+                
+                // Check if cell has star and play particle effect
+                if (cell.starRenderer != null && cell.starRenderer.enabled)
+                {
+                    cell.PlayStarBonusParticle();
+                }
+                
+                yield return new WaitForSeconds(delayBetweenBlasts);
+            }
+        }
+
+        public void HoverCells()
         {
             foreach (var cell in cells)
             {
