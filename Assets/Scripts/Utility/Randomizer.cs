@@ -3,9 +3,9 @@ using URandom = UnityEngine.Random;
 using System;
 using System.Linq;
 using UnityEngine;
-using Ebleme.Extensions;
+using BlastRoot.Extensions;
 
-namespace Ebleme.Utility {
+namespace BlastRoot.Utility {
     public static class Randomizer {
         public static T GetRandomElement<T>(this IEnumerable<T> enumerable) {
             var array = enumerable as T[] ?? enumerable.ToArray();

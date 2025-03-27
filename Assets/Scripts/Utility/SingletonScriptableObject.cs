@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Ebleme.Utility {
+namespace BlastRoot.Utility {
 
     public abstract class SingletonScriptableObject<T> : ScriptableObject where T : ScriptableObject {
 

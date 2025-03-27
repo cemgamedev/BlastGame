@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
-using Ebleme.Extensions;
-using Ebleme.Utility;
+using BlastRoot.Extensions;
+using BlastRoot.Utility;
 using StickBlast;
 using UnityEngine;
 using StickBlast.Models;
 
-namespace Ebleme
+namespace BlastRoot
 {
-    [CreateAssetMenu(fileName = "CommonGameAssets", menuName = "Ebleme/CommonGameAssets", order = 0)]
+    [CreateAssetMenu(fileName = "CommonGameAssets", menuName = "BlastRoot/CommonGameAssets", order = 0)]
     public class CommonGameAssets : SingletonScriptableObject<CommonGameAssets>
     {
         [SerializeField]

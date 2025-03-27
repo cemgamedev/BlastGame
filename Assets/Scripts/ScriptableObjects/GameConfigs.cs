@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using Ebleme.Utility;
+using BlastRoot.Utility;
 using StickBlast;
 using UnityEngine;
 
-namespace Ebleme
+namespace BlastRoot
 {
-    [CreateAssetMenu(fileName = "GameConfigs", menuName = "Ebleme/GameConfigs", order = 0)]
+    [CreateAssetMenu(fileName = "GameConfigs", menuName = "BlastRoot/GameConfigs", order = 0)]
     public class GameConfigs : SingletonScriptableObject<GameConfigs>
     {
         [SerializeField]

@@ -6,7 +6,7 @@ using StickBlast.Core.Interfaces;
 using StickBlast.Models;
 using UnityEngine;
 using UniRx;
-using Ebleme;
+using BlastRoot;
 using Cysharp.Threading.Tasks;
 
 namespace StickBlast.Implementation

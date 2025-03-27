@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ScriptableObjects
 {
-    [CreateAssetMenu(fileName = "Level", menuName = "Ebleme/Level", order = 0)]
+    [CreateAssetMenu(fileName = "Level", menuName = "BlastRoot/Level", order = 0)]
     public class LevelPreset : ScriptableObject
     {
         [SerializeField]

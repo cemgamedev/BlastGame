@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Ebleme.Utility {
+namespace BlastRoot.Utility {
 
     /// <summary>
     /// Singleton class.

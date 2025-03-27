@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Ebleme.Extensions {
+namespace BlastRoot.Extensions {
     public static class CollectionsExtensions {
         public static T RemoveAndGetItem<T>(this IList<T> list, int indexToRemove) {
             var item = list[indexToRemove];
