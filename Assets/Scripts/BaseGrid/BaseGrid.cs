@@ -140,7 +140,6 @@ namespace StickBlast
             for (int i = 0; i < cellsList.Count; i++)
             {
                 var cell = cellsList[i];
-                cell.PlayBlastEffect(i * delayBetweenBlasts, () => {
                     // Reset cell color after blast
                     cell.ClearOccupation();
                     completedCount++;
@@ -160,7 +159,6 @@ namespace StickBlast
                         // clear cells
                         gridCells.CheckCells();
                     }
-                });
                 yield return new WaitForSeconds(delayBetweenBlasts);
             }
         }
