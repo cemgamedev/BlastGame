@@ -176,6 +176,31 @@ namespace StickBlast
             return transform.position;
         }
 
+        public Vector3 GetGridPosition()
+        {
+            // Get the first tile's position as the grid position
+            if (tiles.Count > 0)
+            {
+                var hit = tiles[0].Hit();
+                if (hit.transform != null)
+                {
+                    return hit.transform.position;
+                }
+            }
+            return transform.position;
+        }
+
+        public void SetToGrid()
+        {
+            AssingItemTilesToGridTiles();
+            DestroyItem();
+        }
+
+        public Vector3 GetSpawnPosition()
+        {
+            return spawnPosition;
+        }
+
         public void SetPosition(Vector2 position)
         {
             transform.position = position;

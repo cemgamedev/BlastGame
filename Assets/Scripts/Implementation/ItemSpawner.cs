@@ -9,6 +9,7 @@ using StickBlast.Models;
 using UniRx;
 using StickBlast.Core.Interfaces;
 using StickBlast.Implementation;
+using Cysharp.Threading.Tasks;
 
 namespace StickBlast.Implementation
 {
@@ -78,13 +79,14 @@ namespace StickBlast.Implementation
                 items.Add(item);
             }
 
-            animationController.HandleItemAnimation(items, itemPoints)
-                .Subscribe(_ =>
-                {
-                    foreach (var item in items)
-                        item.SetCanTouch();
-                })
-                .AddTo(disposables);
+            HandleItemAnimationAsync(items).Forget();
+        }
+
+        private async UniTaskVoid HandleItemAnimationAsync(List<Item> items)
+        {
+            await animationController.HandleItemAnimationAsync(items, itemPoints);
+            foreach (var item in items)
+                item.SetCanTouch();
         }
 
         public void HandleItemDestruction(Item item)

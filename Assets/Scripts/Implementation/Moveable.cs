@@ -3,6 +3,7 @@ using StickBlast.Core.Interfaces;
 using StickBlast.Models;
 using StickBlast.Core.DependencyInjection;
 using UniRx;
+using Cysharp.Threading.Tasks;
 
 namespace StickBlast.Implementation
 {
@@ -60,27 +61,28 @@ namespace StickBlast.Implementation
             animationController.HandleItemHover(transform, false);
 
             var allowSetToGrid = itemTile.Item.AllowSetToGrid();
-
             if (allowSetToGrid)
             {
-                var targetPosition = itemTile.Item.GetPosition();
-                animationController.HandleItemPlacement(transform, targetPosition)
-                    .Subscribe(_ =>
-                    {
-                        itemTile.Item.AssingItemTilesToGridTiles();
-                        BaseGrid.Instance.CheckGrid();
-                    })
-                    .AddTo(disposables);
+                HandleItemPlacementAsync().Forget();
             }
             else
             {
-                animationController.HandleItemSnap(transform, itemTile.Item.GetOriginalPosition())
-                    .Subscribe(_ =>
-                    {
-                        itemTile.Item.ReleaseAll();
-                    })
-                    .AddTo(disposables);
+                HandleItemSnapAsync().Forget();
             }
+        }
+
+        private async UniTaskVoid HandleItemPlacementAsync()
+        {
+            canMove = false;
+            await animationController.HandleItemPlacementAsync(transform, itemTile.Item.GetGridPosition());
+            itemTile.Item.SetToGrid();
+        }
+
+        private async UniTaskVoid HandleItemSnapAsync()
+        {
+            canMove = false;
+            await animationController.HandleItemSnapAsync(transform, itemTile.Item.GetSpawnPosition());
+            canMove = true;
         }
 
         public void OnDragStart(Vector2 position)

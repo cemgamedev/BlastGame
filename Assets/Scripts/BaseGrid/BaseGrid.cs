@@ -10,6 +10,7 @@ using StickBlast.Grid;
 using UnityEngine;
 using StickBlast.Models;
 using System.Collections;
+using Cysharp.Threading.Tasks;
 
 namespace StickBlast
 {
@@ -111,11 +112,11 @@ namespace StickBlast
 
             if (linesToRemove.Count > 0)
             {
-                StartCoroutine(HandleCompletedLines());
+                HandleCompletedLinesAsync().Forget();
             }
         }
 
-        private IEnumerator HandleCompletedLines()
+        private async UniTask HandleCompletedLinesAsync()
         {
             // Get all cells that need to play blast effect
             var cellsToBlast = new HashSet<GridCell>();
@@ -140,26 +141,26 @@ namespace StickBlast
             for (int i = 0; i < cellsList.Count; i++)
             {
                 var cell = cellsList[i];
-                    // Reset cell color after blast
-                    cell.ClearOccupation();
-                    completedCount++;
-                    
-                    if (completedCount == totalCellsToBlast)
+                // Reset cell color after blast
+                cell.ClearOccupation();
+                completedCount++;
+                
+                if (completedCount == totalCellsToBlast)
+                {
+                    // All blast effects completed, remove the lines
+                    foreach (var line in linesToRemove)
                     {
-                        // All blast effects completed, remove the lines
-                        foreach (var line in linesToRemove)
-                        {
-                            line.DeOccupied();
-                            line.DeHover();
-                        }
-
-                        foreach (var tile in tilesToRemove)
-                            tile.DeOccupied();
-
-                        // clear cells
-                        gridCells.CheckCells();
+                        line.DeOccupied();
+                        line.DeHover();
                     }
-                yield return new WaitForSeconds(delayBetweenBlasts);
+
+                    foreach (var tile in tilesToRemove)
+                        tile.DeOccupied();
+
+                    // clear cells
+                    gridCells.CheckCells();
+                }
+                await UniTask.Delay(TimeSpan.FromSeconds(delayBetweenBlasts));
             }
         }
 
