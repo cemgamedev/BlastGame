@@ -246,7 +246,13 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Rectangle_0: 7890246350005439881
+      Rectangle_1: 320147255234652826
+      Rectangle_2: -2434560999320271495
+      Rectangle_3: 6925197794509294880
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
