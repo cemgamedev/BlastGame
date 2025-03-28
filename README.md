@@ -1,35 +1,29 @@
-1. Project Overview
-Stick Blast is a mobile game project developed using the Unity game engine. The project follows modern game development practices and adheres to the SOLID principles to ensure a well-structured architecture.
+# Blast Game
 
-2. Technologies Used
-2.1 Main Technologies
-Unity Game Engine: The core game engine for the project
+Blast Game is a mobile game project developed using the Unity game engine. The project follows modern game development practices and adheres to the **SOLID** principles to ensure a well-structured architecture.
 
-C#: The programming language used
+## Technologies Used
 
-DOTween: For animations and transitions
+### Main Technologies
+- **Unity Game Engine**: The core game engine for the project
+- **C#**: The programming language used
+- **DOTween**: For animations and transitions
+- **UniTask**: For asynchronous programming
+- **Dependency Injection**: Utilized to eliminate dependencies using a container
+- **UniRx**: For reactive programming
+- **TextMesh Pro**: For advanced text rendering and UI
+- **Odin Inspector**: For improved Unity Inspector functionality
 
-UniTask: For asynchronous programming
+### Architecture and Design Patterns
+- **Dependency Injection**: For dependency management
+- **SOLID Principles**: For organized and maintainable code
+- **Scriptable Objects**: For data management
+- **Interface-based Programming**: For modularity and testability
 
-Dependency Injection: Utilized to eliminate dependencies using a container
+## Project Architecture
 
-UniRx: For reactive programming
-
-TextMesh Pro: For advanced text rendering and UI
-
-Odin Inspector: For improved Unity Inspector functionality
-
-2.2 Architecture and Design Patterns
-Dependency Injection: For dependency management
-
-SOLID Principles: For organized and maintainable code
-
-Scriptable Objects: For data management
-
-Interface-based Programming: For modularity and testability
-
-3. Project Architecture
-3.1 Folder Structure
+### Folder Structure
+```
 Assets
 ├── Art/                  # Visual assets
 ├── Audio/                # Audio files
@@ -46,3 +40,30 @@ Assets
    └── ScriptableObjects  # Scriptable objects
 ├── TextMesh Pro/         # TMPro assets
 └── ThirdParty/           # Third-party libraries
+```
+
+## Getting Started
+
+### Prerequisites
+- Unity (Recommended version: **2022.x** or higher)
+- .NET SDK (for C# development)
+
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/cemgamedev/BlastGame.git
+   ```
+2. Open the project in Unity.
+3. Install the required dependencies via Unity's Package Manager:
+   - **DOTween**
+   - **UniTask**
+   - **UniRx**
+   - **Odin Inspector**
+4. Build and run the project to start playing.
+
+## Contribution
+Contributions are welcome! If you'd like to improve Stick Blast, please submit a pull request or open an issue.
+
+## License
+This project is licensed under the [MIT License](LICENSE).
+
