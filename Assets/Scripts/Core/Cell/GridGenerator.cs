@@ -7,6 +7,8 @@ using StickBlast.Models;
 using System.Collections;
 using TMPro;
 using DG.Tweening;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace StickBlast
 {
@@ -24,6 +26,9 @@ namespace StickBlast
         [SerializeField]
         private TextMeshProUGUI scoreText;
 
+        [SerializeField]
+        private Button RestartButton;
+
         private int currentCombo = 0;
         private int currentScore = 0;
         private Sequence comboSequence;
@@ -39,9 +44,15 @@ namespace StickBlast
         private List<SquareCell> cells = new List<SquareCell>();
         private HashSet<Vector2Int> completedCells = new HashSet<Vector2Int>(); // Tamamlanan hücreleri takip etmek için
 
-        private void OnDestroy()
+        const string GameScene = "GameScene";
+
+		private void OnDestroy()
         {
-            if (comboSequence != null)
+			this.RestartButton
+		  .onClick
+		  .RemoveListener(RestartHandler);
+
+			if (comboSequence != null)
             {
                 comboSequence.Kill();
                 comboSequence = null;
@@ -89,9 +100,13 @@ namespace StickBlast
 
         private void Start()
         {
+            this.RestartButton
+                .onClick
+                .AddListener(RestartHandler);
+			
             currentCombo = 0;
             currentScore = 0;
-            completedCells.Clear(); // Yeni oyun başladığında tamamlanan hücreleri sıfırla
+            completedCells.Clear();
             UpdateScoreText();
         }
 
@@ -333,5 +348,9 @@ namespace StickBlast
         {
             ScoreHandler(GRID_PLACEMENT_POINTS);
         }
-    }
+        protected void RestartHandler()
+		{
+			SceneManager.LoadScene(GameScene);
+		}
+	}
 }
