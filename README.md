@@ -41,6 +41,8 @@ Assets
 ├── TextMesh Pro/         # TMPro assets
 └── ThirdParty/           # Third-party libraries
 ```
+![image](https://github.com/user-attachments/assets/c7ac8662-68fc-4d4b-9708-204de58f8912)
+![image](https://github.com/user-attachments/assets/74ec144f-9451-47fc-b935-e01d09113569)
 
 ## Getting Started
 
